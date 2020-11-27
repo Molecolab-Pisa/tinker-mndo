@@ -2,8 +2,8 @@
       use sizes
 
       implicit none
-      integer nqmat
-      integer qmat(maxatm)
+      integer nqmatoms
+      integer qmlist(maxatm)
       logical domndo 
 
       end

@@ -1594,7 +1594,7 @@ libtinker.a: ${OBJS}
 ###############################################################
 
 action.o:
-active.o: atoms.o inform.o iounit.o keys.o usage.o
+active.o: atoms.o inform.o iounit.o keys.o mndo.o usage.o
 alchemy.o: analyz.o atoms.o energi.o files.o inform.o iounit.o katoms.o mutant.o potent.o units.o usage.o
 align.o:
 alterchg.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o couple.o inform.o iounit.o math.o mplpot.o mpole.o mutant.o sizes.o

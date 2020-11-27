@@ -21,6 +21,7 @@ c
       use inform
       use iounit
       use keys
+      use mndo
       use usage
       implicit none
       integer i,j,next
@@ -61,6 +62,11 @@ c
          fixed(i) = 0
       end do
       nsphere = 0
+
+      nqmatoms = 0
+      do i=1, n
+        qmlist(i) = 0
+      end do
 c
 c     get any keywords containing active atom parameters
 c
@@ -90,6 +96,17 @@ c
                nfixed = nfixed + 1
                fixed(nfixed) = max(-n,min(n,fixed(nfixed)))
             end do
+c     
+c
+c
+         else if (keyword(1:8) .eq. 'QMATOMS ') then
+            read (string,*,err=25,end=25)  (qmlist(i),i=nqmatoms+1,n)
+   25       continue
+            do while (qmlist(nqmatoms+1) .ne. 0)
+               nqmatoms = nqmatoms + 1
+               if (nqmatoms.eq.n) exit
+            end do
+
 c
 c     get the center and radius of the sphere of active atoms
 c
