@@ -52,8 +52,11 @@
             if (i .eq. mndot_oline + 2) isec = 2
           else if (isec .eq. 2) then
             write(6, *) '(C)  '
-            if (l .eq. 0) isec = 3
-            temp_nat = temp_nat + 1
+            if (l .eq. 0) then
+              isec = 3
+            else 
+              temp_nat = temp_nat + 1
+            end if
           else if (isec .eq. 3) then
             write(6, *) '(E) '
             mndot_eline = mndot_eline + 1
@@ -68,6 +71,4 @@
           write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
           call fatal
         end if
-
-        call mndomkin
       end
