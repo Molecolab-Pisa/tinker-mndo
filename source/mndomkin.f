@@ -5,8 +5,6 @@
         use charge
 
         implicit none
-        character*1024, parameter :: mndo_in = "tmp_mndo.inp"
-        integer, parameter :: mndo_in_unit = 998
 
         integer :: i, j, l, elb
         logical :: isqm
