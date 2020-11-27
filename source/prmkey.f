@@ -23,6 +23,7 @@ c
       use ctrpot
       use dsppot
       use fields
+      use mndo
       use mplpot
       use polpot
       use potent
@@ -190,6 +191,8 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_extra = .true.
          if (value .eq. 'NONE')  use_extra = .false.
+      else if (keyword(1:7) .eq. 'MNDOMM ') then
+         domndo = .true.
       end if
 c
 c     select the name of the force field parameter set
