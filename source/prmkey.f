@@ -23,7 +23,6 @@ c
       use ctrpot
       use dsppot
       use fields
-      use mndo
       use mplpot
       use polpot
       use potent
@@ -192,7 +191,7 @@ c
          use_extra = .true.
          if (value .eq. 'NONE')  use_extra = .false.
       else if (keyword(1:7) .eq. 'MNDOMM ') then
-         domndo = .true.
+         use_mndo = .true.
       end if
 c
 c     select the name of the force field parameter set
@@ -540,5 +539,6 @@ c
       use_metal = .false.
       use_geom = .false.
       use_extra = .false.
+      use_mndo = .false.
       return
       end

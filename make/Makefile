@@ -320,6 +320,8 @@ OBJS =	action.o \
 	emm3hb1.o \
 	emm3hb2.o \
 	emm3hb3.o \
+	emndoqm.o \
+    emndoqm1.o \
 	empole.o \
 	empole1.o \
 	empole2.o \
@@ -1222,6 +1224,8 @@ libtinker.a: ${OBJS}
 	emm3hb1.o \
 	emm3hb2.o \
 	emm3hb3.o \
+	emndoqm.o \
+	emndoqm1.o \
 	empole.o \
 	empole1.o \
 	empole2.o \
@@ -1751,7 +1755,7 @@ empole1.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o ene
 empole2.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o group.o hessn.o limits.o molcul.o mplpot.o mpole.o potent.o shunt.o usage.o
 empole3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o neigh.o pme.o potent.o shunt.o usage.o
 energi.o:
-energy.o: energi.o iounit.o limits.o potent.o rigid.o vdwpot.o
+energy.o: energi.o iounit.o limits.o mndo.o potent.o rigid.o vdwpot.o
 eopbend.o: angbnd.o angpot.o atoms.o bound.o energi.o fields.o group.o math.o opbend.o usage.o
 eopbend1.o: angbnd.o angpot.o atoms.o bound.o deriv.o energi.o group.o math.o opbend.o usage.o virial.o
 eopbend2.o: angbnd.o angpot.o atoms.o bound.o group.o hessn.o math.o opbend.o
@@ -1837,7 +1841,7 @@ getword.o: ascii.o
 getxyz.o: inform.o iounit.o output.o
 ghmcstep.o: atomid.o atoms.o bath.o freeze.o iounit.o mdstuf.o moldyn.o stodyn.o units.o usage.o virial.o
 gkstuf.o: sizes.o
-gradient.o: atoms.o couple.o deriv.o energi.o inter.o iounit.o limits.o potent.o rigid.o vdwpot.o virial.o
+gradient.o: atoms.o couple.o deriv.o energi.o inter.o iounit.o limits.o mndo.o potent.o rigid.o vdwpot.o virial.o
 gradrgd.o: atoms.o group.o rigid.o
 gradrot.o: atoms.o deriv.o domega.o omega.o potent.o rotbnd.o
 group.o:

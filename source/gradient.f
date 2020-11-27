@@ -24,6 +24,7 @@ c
       use inter
       use iounit
       use limits
+      use mndo
       use potent
       use rigid
       use vdwpot
@@ -64,6 +65,7 @@ c
       elf = 0.0d0
       eg = 0.0d0
       ex = 0.0d0
+      emndo = 0.0d0
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -98,6 +100,7 @@ c
             deallocate (delf)
             deallocate (deg)
             deallocate (dex)
+            deallocate (demndo)
          end if
       end if
       if (.not. allocated(desum)) then
@@ -130,6 +133,7 @@ c
          allocate (delf(3,n))
          allocate (deg(3,n))
          allocate (dex(3,n))
+         allocate (demndo(3,n))
       end if
 c
 c     zero out each of the first derivative components
@@ -164,6 +168,7 @@ c
             delf(j,i) = 0.0d0
             deg(j,i) = 0.0d0
             dex(j,i) = 0.0d0
+            demndo(j,i) = 0.0d0
          end do
       end do
 c
@@ -242,13 +247,14 @@ c
       if (use_metal)  call emetal1
       if (use_geom)  call egeom1
       if (use_extra)  call extra1
+      if (use_mndo)  call emndoqm1
 c
 c     sum up to get the total energy and first derivatives
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
      &          + et + ept + ebt + eat + ett + ev + er + edsp
      &          + ec+ ecd + ed + em + ep + ect + erxf + es + elf
-     &          + eg + ex
+     &          + eg + ex + emndo
       energy = esum
       do i = 1, n
          do j = 1, 3
@@ -261,7 +267,8 @@ c
      &                      + decd(j,i) + ded(j,i) + dem(j,i)
      &                      + dep(j,i) + dect(j,i) + derxf(j,i)
      &                      + des(j,i) + delf(j,i)
-     &                      + deg(j,i) + dex(j,i)
+     &                      + deg(j,i) + dex(j,i) 
+     &                      + demndo(j,i)
             derivs(j,i) = desum(j,i)
          end do
       end do

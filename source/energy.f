@@ -20,6 +20,7 @@ c
       use energi
       use iounit
       use limits
+      use mndo
       use potent
       use rigid
       use vdwpot
@@ -58,6 +59,7 @@ c
       elf = 0.0d0
       eg = 0.0d0
       ex = 0.0d0
+      emndo = 0.0d0
 c
 c     update the pairwise interaction neighbor lists
 c
@@ -125,13 +127,14 @@ c
       if (use_geom)  call egeom
       if (use_metal)  call emetal
       if (use_extra)  call extra
+      if (use_mndo)  call emndoqm
 c
 c     sum up to give the total potential energy
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
      &          + et + ept + ebt + eat + ett + ev + er + edsp
      &          + ec + ecd + ed + em + ep + ect + erxf + es + elf
-     &          + eg + ex
+     &          + eg + ex + emndo
       energy = esum
 c
 c     check for an illegal value for the total energy

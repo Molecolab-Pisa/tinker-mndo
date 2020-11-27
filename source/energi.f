@@ -55,5 +55,6 @@ c
       real*8 em,ep,ect
       real*8 erxf,es,elf
       real*8 eg,ex
+      real*8 emndo
       save
       end

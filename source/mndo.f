@@ -4,6 +4,6 @@
       implicit none
       integer nqmatoms
       integer qmlist(maxatm)
-      logical domndo 
-
+      character*512 template(100) 
+      save
       end
