@@ -321,7 +321,7 @@ OBJS =	action.o \
 	emm3hb2.o \
 	emm3hb3.o \
 	emndoqm.o \
-    emndoqm1.o \
+	emndoqm1.o \
 	empole.o \
 	empole1.o \
 	empole2.o \
@@ -634,6 +634,7 @@ OBJS =	action.o \
 	readgau.o \
 	readgdma.o \
 	readint.o \
+        readmndoout.o \
 	readmol.o \
 	readmol2.o \
 	readpdb.o \
@@ -1514,6 +1515,7 @@ libtinker.a: ${OBJS}
 	readgau.o \
 	readgdma.o \
 	readint.o \
+        readmndoout.o \
 	readmol.o \
 	readmol2.o \
 	readpdb.o \
