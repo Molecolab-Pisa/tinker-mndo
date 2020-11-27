@@ -191,7 +191,9 @@ c
          use_extra = .true.
          if (value .eq. 'NONE')  use_extra = .false.
       else if (keyword(1:7) .eq. 'MNDOMM ') then
+         write(6, *) "MNDO will be used!"
          use_mndo = .true.
+         call mndoinit
       end if
 c
 c     select the name of the force field parameter set

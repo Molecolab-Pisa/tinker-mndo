@@ -65,7 +65,9 @@
 
         if (temp_nat .ne. nqmatoms) then
           write(6, *) "Wrong number of QM atoms in template"
+          write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
           call fatal
         end if
 
+        call mndomkin
       end
