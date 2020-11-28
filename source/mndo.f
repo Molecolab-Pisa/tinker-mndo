@@ -78,7 +78,7 @@ c         Create a line every 50 char
           end do
         end do
 
-c       A smart check should be done TODO
+c       A smart check should be done
         call mndo_check_keys(original_keyword, ikey)
       end
 
@@ -101,26 +101,67 @@ c       7         8
      &  /)
         integer :: automatic_prm(nauto) = (/ 1, -2, 2, -1, 2, 0, 3, 1/)
         
-        integer :: i, j, k, l
-        character(len=128) :: rch
+        integer :: i, j, k, l, prm
+        character(len=128) :: rch, kw
+        logical :: isauto
 
         integer trimtext
 
         automatic_prm(4) = n - nqmatoms
 
 c       Check and remove unneeded automatic keyword
+
+        mndo_nwk = 1
         do i=1, nkw
-          continue
+          l = trimtext(orig_kw(i))
+          if(l.eq.0) cycle
+
+          write(6, *) l,">", orig_kw(i)(:l), "<"
+          do j=1, l
+            if(orig_kw(i)(j:j) .eq. '=') exit
+          end do
+
+          if(j.eq.l+1) then
+            write(6, *) "A keyword provided in template file (",
+     &      orig_kw(i)(:l), ") does not contain '='."
+            write(6, *) "This is not allowed, please only use MNDO ",
+     &      "standard input format."
+            call fatal
+          end if
+
+          kw = orig_kw(i)(:j-1)
+          kw(j:) = ' '
+          read(orig_kw(i)(j+1:l),'(I10)') prm
+          l = trimtext(kw)
+          
+c         Check if it is not in an automatic keyword
+          isauto = .false.
+          do j=1, nauto
+            if(kw(:8) .eq. automatic_kwd(j)) then
+              write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
+     &        "MNDO interface. The value found in template will be ",
+     &        "ignored."
+              isauto = .true.
+              exit
+            endif
+          end do
+
+          if(.not. isauto) then
+            write(rch, *) prm
+            rch = adjustl(rch)
+            write(key_buffer(mndo_nwk), "(A,'=',A)") 
+     &      kw(:l),
+     &      rch(:trimtext(rch))     
+            mndo_nwk = mndo_nwk + 1
+          end if
         end do
         
-        mndo_nwk = 1
         do i=1, nauto
           write(rch, *) automatic_prm(i)
           rch = adjustl(rch)
-          write(key_buffer(i), "(A,'=',A)") 
+          write(key_buffer(mndo_nwk), "(A,'=',A)") 
      &    automatic_kwd(i)(:trimtext(automatic_kwd(i))),
      &    rch(:trimtext(rch))     
-
           mndo_nwk = mndo_nwk + 1
         end do
 
