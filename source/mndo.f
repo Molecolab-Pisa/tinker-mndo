@@ -116,7 +116,6 @@ c       Check and remove unneeded automatic keyword
           l = trimtext(orig_kw(i))
           if(l.eq.0) cycle
 
-          write(6, *) l,">", orig_kw(i)(:l), "<"
           do j=1, l
             if(orig_kw(i)(j:j) .eq. '=') exit
           end do

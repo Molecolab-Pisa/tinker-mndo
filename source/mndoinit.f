@@ -10,7 +10,9 @@
         character(len=1024), allocatable :: mndo_template(:)
 
         integer trimtext
-        
+       
+        write(6, *) "+++ MNDO INITIALIZATION +++"
+
         imm = 1
         do i=1, n
           isqm(i) = .false.
@@ -57,26 +59,26 @@
         do i=1, mndot_nline
           l = trimtext(mndo_template(i))
           if (isec .eq. 0) then
-            write(6, *) '(O)  '
+c            write(6, *) '(O)  '
             mndot_oline = mndot_oline + 1
             if (mndo_template(i)(l:l) .ne. '+') isec = 1
           else if (isec .eq. 1) then
-            write(6, *) '(H)  '
+c            write(6, *) '(H)  '
             if (i .eq. mndot_oline + 2) isec = 2
           else if (isec .eq. 2) then
-            write(6, *) '(C)  '
+c            write(6, *) '(C)  '
             if (l .eq. 0) then
               isec = 3
             else 
               temp_nat = temp_nat + 1
             end if
           else if (isec .eq. 3) then
-            write(6, *) '(E) '
+c            write(6, *) '(E) '
             mndot_eline = mndot_eline + 1
           else 
-            write(6, *) '(?)  '
+c            write(6, *) '(?)  '
           end if
-          write(6,*) mndo_template(i)(:l)
+c          write(6,*) mndo_template(i)(:l)
         end do
 
 c       Check keyword
@@ -94,6 +96,8 @@ c       Sanity check
           write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
           call fatal
         end if
+
+        write(6, *) "+++ MNDO INITIALIZATION FINISHED +++"
 
         ismndoinit = .true.
       end
