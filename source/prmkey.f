@@ -23,6 +23,7 @@ c
       use ctrpot
       use dsppot
       use fields
+      use mndo
       use mplpot
       use polpot
       use potent
@@ -193,7 +194,7 @@ c
       else if (keyword(1:7) .eq. 'MNDOMM ') then
          write(6, *) "MNDO will be used!"
          use_mndo = .true.
-         call mndoinit
+         ismndoinit = .false. 
       end if
 c
 c     select the name of the force field parameter set

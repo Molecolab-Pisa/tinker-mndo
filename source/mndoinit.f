@@ -1,14 +1,27 @@
       subroutine mndoinit()
+        use atoms
         use mndo
         
         implicit none
         character*1024, parameter :: template_fname = "template.inp"
         integer, parameter :: temp_unit = 999
       
-        integer :: i, l, ios, isec, temp_nat
+        integer :: i, j, imm, l, ios, isec, temp_nat
         logical :: file_exists
 
         integer trimtext
+        
+        imm = 1
+        do i=1, n
+          isqm(i) = .false.
+          do j=1, nqmatoms
+            if(qmlist(j) .eq. i) isqm(i) = .true.
+          end do
+          if(.not. isqm(i)) then
+            mmlist(imm) = i
+            imm = imm + 1
+          end if
+        end do
 
         inquire(file=template_fname, exist=file_exists)
         if(.not. file_exists) then
@@ -71,4 +84,6 @@
           write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
           call fatal
         end if
+
+        ismndoinit = .true.
       end

@@ -7,12 +7,11 @@
         implicit none
 
         integer :: i, j, l, elb
-        logical :: isqm
 
         integer trimtext
   
   10   format(i2, 8x, 3(F10.5,2x,i2,6x))
-  20   format(4F10.5)
+  20   format(3F12.7,F8.4)
 
         open(unit=mndo_in_unit, file=mndo_in)
 
@@ -36,14 +35,9 @@
           write(mndo_in_unit, *) mndo_template(i+elb)(:l)
         end do
 
-        do i=1, n
-          isqm = .false.
-          do j=1, nqmatoms
-            if(i .eq. qmlist(j)) isqm = .true.
-          end do
-          if (.not. isqm) then
-            write(mndo_in_unit, 20) x(i), y(i), z(i), pchg(i)
-          end if 
+        do i=1, n-nqmatoms
+          write(mndo_in_unit, 20) x(mmlist(i)), y(mmlist(i)), 
+     $    z(mmlist(i)), pchg(mmlist(i))
         end do
 
         close(mndo_in_unit)

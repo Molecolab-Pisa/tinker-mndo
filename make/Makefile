@@ -536,6 +536,7 @@ OBJS =	action.o \
 	mndo.o \
 	mndoinit.o \
 	mndomkin.o \
+	mndordout.o \
 	mol2xyz.o \
 	molcul.o \
 	moldyn.o \
@@ -634,7 +635,6 @@ OBJS =	action.o \
 	readgau.o \
 	readgdma.o \
 	readint.o \
-        readmndoout.o \
 	readmol.o \
 	readmol2.o \
 	readpdb.o \
@@ -1437,6 +1437,7 @@ libtinker.a: ${OBJS}
 	mndo.o \
 	mndoinit.o \
 	mndomkin.o \
+	mndordout.o \
 	molcul.o \
 	moldyn.o \
 	molecule.o \
@@ -1515,7 +1516,6 @@ libtinker.a: ${OBJS}
 	readgau.o \
 	readgdma.o \
 	readint.o \
-        readmndoout.o \
 	readmol.o \
 	readmol2.o \
 	readpdb.o \
