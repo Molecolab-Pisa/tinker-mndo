@@ -3,11 +3,11 @@
         use mndo
         
         implicit none
-        character*1024, parameter :: template_fname = "template.inp"
-        integer, parameter :: temp_unit = 999
       
-        integer :: i, j, imm, l, ios, isec, temp_nat
+        integer :: i, j, imm, l, ios, isec, temp_nat, mndot_nline,
+     $  mndot_oline, mndot_eline
         logical :: file_exists
+        character(len=1024), allocatable :: mndo_template(:)
 
         integer trimtext
         
@@ -79,6 +79,16 @@
           write(6,*) mndo_template(i)(:l)
         end do
 
+c       Check keyword
+        call mndo_parse_key(mndo_template, mndot_oline)
+
+c       Copy "extra" lines
+        do i=1, mndot_eline
+          mndo_eline(i) = mndo_template(mndot_oline+nqmatoms+3+i)
+        end do
+        mndo_neline = mndot_eline
+
+c       Sanity check
         if (temp_nat .ne. nqmatoms) then
           write(6, *) "Wrong number of QM atoms in template"
           write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms

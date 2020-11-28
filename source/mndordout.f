@@ -22,7 +22,8 @@
         inquire(file=mndo_intfi, exist=intfexists)
         if (.not. intfexists) then
           write(6, *) "MNDO interface file was not found."
-          write(6, *) "Interface file path ", mndo_intfi
+          write(6, *) "Interface file path ",
+     &    mndo_intfi(:trimtext(mndo_intfi))
           call fatal
         end if
 
