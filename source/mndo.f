@@ -8,9 +8,9 @@
      & mndo_out = "tmp_mndo.out", 
      & mndo_intfi = "fort.15",
      & template_fname = 'template.inp'
-
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999
+      logical, parameter :: iter_guess = .true.
 
       integer :: nqmatoms
       integer :: qmlist(maxatm), mmlist(maxatm)
@@ -108,6 +108,10 @@ c       7         8
         integer trimtext
 
         automatic_prm(4) = n - nqmatoms
+        if (n - nqmatoms .eq. 0) then
+          automatic_prm(3) = 0
+          automatic_prm(5) = 0
+        end if
 
 c       Check and remove unneeded automatic keyword
 

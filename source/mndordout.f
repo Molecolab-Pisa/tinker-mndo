@@ -38,7 +38,10 @@
             read(line(32:), 10) if_natqm
             isec = 2
           else if(isec .eq. 2) then
-            if( trimtext(line) .eq. 0) isec = 3
+            if( trimtext(line) .eq. 0) then
+              isec = 3
+              if(n-nqmatoms .eq. 0) isec = 5
+            end if
           else if(isec .eq. 3) then
             read(line(59:), 10) if_natmm
             isec = 4
@@ -58,6 +61,7 @@
           else if(isec .eq. 8) then
             if(trimtext(line) .eq. 0) then
               isec = 9
+              if(n-nqmatoms .eq. 0) isec = 11
             else
               read(line, 40) xx, xx, demndo(1, qmlist(j)), 
      $        demndo(2, qmlist(j)), demndo(3, qmlist(j)), xx 
