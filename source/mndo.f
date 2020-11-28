@@ -34,7 +34,7 @@
         do i=1, mndo_nwk
           l = trimtext(mndo_keyword(i))
 
-c         Create a line every 80 char
+c         Create a line every 50 char
           if(nchl + l .gt. 50 .and. nchl .gt. 1) then
             write(unitio, *) '+'
             nchl = 1
@@ -79,12 +79,55 @@ c         Create a line every 80 char
         end do
 
 c       A smart check should be done TODO
-        mndo_nwk = ikey
+        call mndo_check_keys(original_keyword, ikey)
+      end
+
+      subroutine mndo_check_keys(orig_kw, nkw)
+        use atoms
+
+        implicit none
+
+        character(len=128) :: orig_kw(:)
+        integer :: nkw
+
+        character(len=128) :: key_buffer(1024)
+
+        integer, parameter :: nauto = 8
+        character(len=128) :: automatic_kwd(nauto) = (/
+c       1         2         3         4         5         6
+     &  "iform ", "jop   ", "mminp ", "numatm", "mmcoup", "mmskip",
+c       7         8
+     &  "nsav15", "igeom "
+     &  /)
+        integer :: automatic_prm(nauto) = (/ 1, -2, 2, -1, 2, 0, 3, 1/)
+        
+        integer :: i, j, k, l
+        character(len=128) :: rch
+
+        integer trimtext
+
+        automatic_prm(4) = n - nqmatoms
+
+c       Check and remove unneeded automatic keyword
+        do i=1, nkw
+          continue
+        end do
+        
+        mndo_nwk = 1
+        do i=1, nauto
+          write(rch, *) automatic_prm(i)
+          rch = adjustl(rch)
+          write(key_buffer(i), "(A,'=',A)") 
+     &    automatic_kwd(i)(:trimtext(automatic_kwd(i))),
+     &    rch(:trimtext(rch))     
+
+          mndo_nwk = mndo_nwk + 1
+        end do
+
         allocate(mndo_keyword(mndo_nwk))
-        do i=1, ikey
-          l = trimtext(original_keyword(i))
-          mndo_keyword(i) = original_keyword(i)(:l)
+        do i=1, mndo_nwk
+          mndo_keyword(i) = key_buffer(i)
         end do
       end
-      
+
       end module mndo
