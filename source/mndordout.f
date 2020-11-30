@@ -1,10 +1,12 @@
-      subroutine mndordout()
+      subroutine mndordout(doforce)
         use atoms
         use energi
         use deriv
         use mndo
 
         implicit none
+
+        logical :: doforce
 
         logical, parameter :: dosck = .true.
 
@@ -51,7 +53,11 @@
             isec = 6
           else if(isec .eq. 6) then
             if(trimtext(line) .eq. 0) then
-              isec = 7
+              if(doforce) then
+                isec = 7
+              else
+                isec = 11
+              end if
             else
               read(line, 30) emndo, cgn, ign
             end if
@@ -99,37 +105,39 @@ c         Check if you found the correct number of atoms
      &      mndo_intfi(:trimtext(mndo_intfi))
           end if
 
-c         Check if the norm of QM atoms' gradiend is equal to the one in
-c         output file
-          mygn = 0.0
-          do i=1, nqmatoms
-            do j=1, 3
-              mygn = mygn + demndo(j, qmlist(i)) * demndo(j, qmlist(i))
+          if(doforce) then
+c           Check if the norm of QM atoms' gradiend is equal to the one in
+c           output file
+            mygn = 0.0
+            do i=1, nqmatoms
+              do j=1, 3
+                mygn = mygn + demndo(j,qmlist(i)) * demndo(j,qmlist(i))
+              end do
             end do
-          end do
-          mygn = sqrt(mygn)
+            mygn = sqrt(mygn)
 
-          if(abs(mygn - cgn) .gt. 1.0e-7) then
-            sck_passed = .false.
-            write(6, *) "Difference between compute and expected norm ",
-     $      "of QM atoms' gradient > 1.0e-7"
-            write(6, "('Found= ', F12.6, '  Computed= ', F12.6)") cgn,
-     $      mygn
-          end if
+            if(abs(mygn - cgn) .gt. 1.0e-7) then
+              sck_passed = .false.
+              write(6, *)"Difference between compute and expected norm",
+     $        " of QM atoms' gradient > 1.0e-7"
+              write(6, "('Found= ', F12.6, '  Computed= ', F12.6)") cgn,
+     $        mygn
+            end if
 
-c         Check if the computed gradients are OK with Newton 3th law
-          law3 = 0.0
-          do i=1, n
-            do j=1, 3
-              law3(j) = law3(j) + demndo(j, i)
+c           Check if the computed gradients are OK with Newton 3th law
+            law3 = 0.0
+            do i=1, n
+              do j=1, 3
+                law3(j) = law3(j) + demndo(j, i)
+              end do
             end do
-          end do
 
-          if(abs(law3(1)) .gt. 1.0e-6 .or. abs(law3(2)) .gt. 1.0e-6 .or.
-     &       abs(law3(3)) .gt. 1.0e-6) then
-            sck_passed = .false.
-            write(6, *) "Computed forces does not respect Newton 3th ", 
-     &      "law."
+            if(abs(law3(1)) .gt. 1.0e-6 .or. abs(law3(2)) .gt. 1.0e-6 
+     &        .or. abs(law3(3)) .gt. 1.0e-6) then
+              sck_passed = .false.
+              write(6, *) "Computed forces does not respect Newton 3th", 
+     &        " law."
+            end if
           end if
           
           if(.not. sck_passed) then

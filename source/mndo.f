@@ -95,28 +95,33 @@ c       A smart check should be done
 
         character(len=128) :: key_buffer(1024)
 
-        integer, parameter :: nauto = 8
+        integer, parameter :: nauto = 7, nskip = 1
         character(len=128) :: automatic_kwd(nauto) = (/
 c       1         2         3         4         5         6
-     &  "iform ", "jop   ", "mminp ", "numatm", "mmcoup", "mmskip",
-c       7         8
-     &  "nsav15", "igeom "
+     &  "iform ", "mminp ", "numatm", "mmcoup", "mmskip", "nsav15",
+c       7         8         9         10        11        12
+     &  "igeom "
      &  /)
-        integer :: automatic_prm(nauto) = (/ 1, -2, 2, -1, 2, 0, 3, 1/)
+        integer :: automatic_prm(nauto) = (/ 1, 2, -1, 2, 0, 3, 1/)
+
+        character(len=128) :: skip_kwd(nskip) = (/
+c       1         2         3         4         5         6
+     &  "jop   "
+     &  /)
         
         integer :: i, j, k, l, prm
         character(len=128) :: rch, kw
-        logical :: isauto
+        logical :: toadd
 
         integer trimtext
 
         automatic_prm(4) = n - nqmatoms
         if (n - nqmatoms .eq. 0) then
-          automatic_prm(3) = 0
-          automatic_prm(5) = 0
+          automatic_prm(2) = 0
+          automatic_prm(4) = 0
         end if
 
-c       Check and remove unneeded automatic keyword
+c       Check and remove unneeded automatic and skip keyword
 
         mndo_nwk = 1
         do i=1, nkw
@@ -141,18 +146,28 @@ c       Check and remove unneeded automatic keyword
           l = trimtext(kw)
           
 c         Check if it is not in an automatic keyword
-          isauto = .false.
+          toadd = .true.
           do j=1, nauto
             if(kw(:8) .eq. automatic_kwd(j)) then
               write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
      &        "MNDO interface. The value found in template will be ",
      &        "ignored."
-              isauto = .true.
+              toadd = .false.
+              exit
+            endif
+          end do
+          
+          do j=1, nskip
+            if(kw(:8) .eq. skip_kwd(j)) then
+              write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
+     &        "MNDO interface. The value found in template will be ",
+     &        "ignored."
+              toadd = .false.
               exit
             endif
           end do
 
-          if(.not. isauto) then
+          if(toadd) then
             write(rch, *) prm
             rch = adjustl(rch)
             write(key_buffer(mndo_nwk), "(A,'=',A)") 
@@ -161,7 +176,8 @@ c         Check if it is not in an automatic keyword
             mndo_nwk = mndo_nwk + 1
           end if
         end do
-        
+
+c       Now add each automatic keyword
         do i=1, nauto
           write(rch, *) automatic_prm(i)
           rch = adjustl(rch)
@@ -171,9 +187,13 @@ c         Check if it is not in an automatic keyword
           mndo_nwk = mndo_nwk + 1
         end do
 
-        allocate(mndo_keyword(mndo_nwk))
+        mndo_nwk = mndo_nwk - 1
+        allocate(mndo_keyword(mndo_nwk + nskip))
         do i=1, mndo_nwk
           mndo_keyword(i) = key_buffer(i)
+          if(mndo_debug) 
+     &      write(6, '("(",I3,")  ", A)')
+     &      i, mndo_keyword(i)(:trimtext(mndo_keyword(i)))      
         end do
       end
 

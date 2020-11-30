@@ -8,6 +8,8 @@
         
         integer trimtext
 
+        if(mndo_debug) write(6, *) "Entering EMNDOQM1"
+
         if(.not. ismndoinit) call mndoinit
         
 c       Before each call remove old temp files.
@@ -17,8 +19,13 @@ c       Before each call remove old temp files.
         if(mndo_debug) write(6, *) command(:trimtext(command))
         status = system(command)
 
-c       Create new input file
+c       Create new input file with jop=-2 for gradients calculation
+        write(mndo_keyword(mndo_nwk+1), "(A,'=',A)") "jop", "-2"
+        mndo_nwk = mndo_nwk + 1
+        
         call mndomkin
+        
+        mndo_nwk = mndo_nwk - 1
 
 c       Run MNDO
         write(command, *) mndo_exe(:trimtext(mndo_exe)), 
@@ -28,7 +35,7 @@ c       Run MNDO
         status = system(command)
 
 c       Read the output to populate emndo demndo
-        call mndordout
+        call mndordout(.true.)
 
 c       Post-execution script
         if(mndo_dope) then
