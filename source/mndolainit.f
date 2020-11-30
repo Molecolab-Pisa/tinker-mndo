@@ -8,6 +8,8 @@
         integer :: i, j, k, iatqm
 
 c       Find out if a link atom is needed
+        write(6,*) 'SCHIANTA FORSE QUA?'
+        flush(6)
         mndo_usela = .false.
         mndo_nla = 0
         do i=1, nqmatoms
