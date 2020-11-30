@@ -90,13 +90,6 @@ c       Read template file and save keyword
 c       Check keyword
         call mndo_parse_key(mndo_template, mndot_oline)
 
-c       Sanity check of template
-c        if (temp_nat .ne. nqmatoms+mndo_nla) then
-c          write(6, *) "Wrong number of QM atoms in template"
-c          write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
-c          call fatal
-c        end if
-
 c       Debug information        
         if(mndo_debug) then
           write(6, *) "=== MNDO OPTIONS ==="
@@ -106,6 +99,12 @@ c       Debug information
      &      mndo_exe(:trimtext(mndo_exe))
           write(6, "('   QM ATOMS: ', I5)") nqmatoms
           write(6, "('   MM ATOMS: ', I5)") n - nqmatoms
+          if(mndo_multistate) then
+            write(6, "('   MNDO MULTISTATE: ', 5I5)") mndo_states
+            write(6, "('   MNDO SELECT. STATE: ', I5)")
+     &      mndo_currentstate
+          end if
+
           if(mndo_dope) 
      &      write(6, *) "  MNDO POST EXECUTION SCRIPT: ",
      &      mndo_postexe(:trimtext(mndo_postexe))

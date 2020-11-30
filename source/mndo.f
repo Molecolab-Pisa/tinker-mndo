@@ -23,6 +23,10 @@
       integer :: qmlist(maxatm), mmlist(maxatm), mndo_laqm(maxatm),
      &           mndo_lamm(maxatm) 
       logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
+
+      integer :: mndo_nstates, mndo_currentstate, mndo_states(5), 
+     &           mndo_kci
+      logical :: mndo_multistate
       
       integer :: mndo_nwk, mndo_neline
       character(len=128), allocatable :: mndo_keyword(:), mndo_eline(:)
@@ -162,7 +166,9 @@ c       Check and remove unneeded automatic and skip keyword
           kw(j:) = ' '
           read(orig_kw(i)(j+1:l),'(I10)') prm
           l = trimtext(kw)
-          
+         
+          if(kw(:8) .eq. 'kci   ') mndo_kci = prm
+
 c         Check if it is not in an automatic keyword
           toadd = .true.
           do j=1, nauto

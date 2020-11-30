@@ -193,9 +193,12 @@ c
          if (value .eq. 'NONE')  use_extra = .false.
       else if (keyword(1:7) .eq. 'MNDOMM ') then
          use_mndo = .true.
+c        TODO move these somwhere else...
          ismndoinit = .false.
          mndo_dope = .false.
          mndo_iterguess = .true.
+         mndo_multistate = .false.
+
          mndo_exe = mndo_default_exe
          template_fname = mndo_default_template
          
@@ -209,6 +212,12 @@ c
       else if (keyword(1:12) .eq. 'MNDOPOSTEXE ') then
          mndo_postexe = adjustl(text(12:))
          mndo_dope = .true.
+      else if (keyword(1:11) .eq. 'MNDOSTATES ') then
+         mndo_multistate = .true.
+         read(keyword(11:), "(5I10)") mndo_states
+      else if (keyword(1:17) .eq. 'MNDOCURRENTSTATE ') then
+         read(keyword(17:), "(I17)") mndo_currentstate
+
       end if
 c
 c     select the name of the force field parameter set
