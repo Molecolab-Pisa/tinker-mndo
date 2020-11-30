@@ -534,6 +534,7 @@ OBJS =	action.o \
 	minirot.o \
 	minrigid.o \
 	mndo.o \
+	mndoclearmm.o \
 	mndoinit.o \
 	mndomkin.o \
 	mndordout.o \
@@ -1435,6 +1436,7 @@ libtinker.a: ${OBJS}
 	merge.o \
 	minima.o \
 	mndo.o \
+	mndoclearmm.o \
 	mndoinit.o \
 	mndomkin.o \
 	mndordout.o \

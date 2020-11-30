@@ -10,8 +10,6 @@
 
         if(mndo_debug) write(6, *) "Entering EMNDOQM"
 
-        if(.not. ismndoinit) call mndoinit
-        
 c       Before each call remove old temp files.
         write(command, *) "rm -f ", mndo_in(:trimtext(mndo_in)), " ",
      &  mndo_out(:trimtext(mndo_out)), " ", 
