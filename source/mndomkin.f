@@ -7,6 +7,7 @@
         implicit none
 
         integer :: i, j, l, elb
+        real*8 :: lapos(3)
 
         integer trimtext
   
@@ -32,12 +33,32 @@ c       Write header comments
      &    y(qmlist(i)), 1, z(qmlist(i)), 1
         end do
 
+        if(mndo_usela) then
+          do i=1, mndo_nla
+c           Compute coordinates of LAs (fixed distance)
+            call mndo_lapos(i, lapos)
+
+c           write down coordinates of LAs
+            write(mndo_in_unit, 10) 1, lapos(1), 1, lapos(2), 1, 
+     &      lapos(3), 1
+          end do
+        end if
+
         write(mndo_in_unit, *) ""
 
         do i=1, mndo_neline
           l = trimtext(mndo_eline(i))
           write(mndo_in_unit, *) mndo_eline(i)(:l)
         end do
+
+        if(mndo_usela) then
+c         write down link atoms list
+          do i=1, mndo_nla
+            if(mod(i,16) .eq. 0) write(mndo_in_unit, *) ""
+            write(mndo_in_unit, "(I5)", advance="no") nqmatoms + i
+          end do
+          write(mndo_in_unit, *) ""
+        end if
 
         do i=1, n-nqmatoms
           write(mndo_in_unit, 20) x(mmlist(i)), y(mmlist(i)), 

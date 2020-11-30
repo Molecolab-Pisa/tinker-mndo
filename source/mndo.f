@@ -11,14 +11,18 @@
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999
       logical, parameter :: mndo_debug = .true.
+      
+      real*8, parameter :: distqmla = 1.00
+
      
       character(len=1024) :: mndo_exe, template_fname, mndo_postexe
       logical :: mndo_iterguess
 
 
-      integer :: nqmatoms
-      integer :: qmlist(maxatm), mmlist(maxatm)
-      logical :: isqm(maxatm), ismndoinit, mndo_dope
+      integer :: nqmatoms, mndo_nla
+      integer :: qmlist(maxatm), mmlist(maxatm), mndo_laqm(maxatm),
+     &           mndo_lamm(maxatm) 
+      logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
       
       integer :: mndo_nwk, mndo_neline
       character(len=128), allocatable :: mndo_keyword(:), mndo_eline(:)
@@ -96,7 +100,7 @@ c       A smart check should be done
 
         character(len=128) :: key_buffer(1024)
 
-        integer, parameter :: nauto = 7, nskip = 1, nitgu = 3
+        integer, parameter :: nauto = 7, nskip = 1, nitgu = 3, nla = 2
         character(len=128) :: automatic_kwd(nauto) = (/
 c       1         2         3         4         5         6
      &  "iform ", "mminp ", "numatm", "mmcoup", "mmskip", "nsav15",
@@ -116,17 +120,24 @@ c       1         2         3         4         5         6
      &  /)
         integer :: itgu_prm(nitgu) = (/ 1, 11, 3 /)
         
+        character(len=128) :: la_kwd(nla) = (/
+c       1         2         3         4         5         6
+     &  "mmlink", "nlink "
+     &  /)
+        integer :: la_prm(nla) = (/ 1, -1 /)
+        
         integer :: i, j, k, l, prm
         character(len=128) :: rch, kw
         logical :: toadd
 
         integer trimtext
 
-        automatic_prm(4) = n - nqmatoms
+        automatic_prm(3) = n - nqmatoms
         if (n - nqmatoms .eq. 0) then
           automatic_prm(2) = 0
           automatic_prm(4) = 0
         end if
+        if(mndo_usela) la_prm(2) = mndo_nla
 
 c       Check and remove unneeded automatic and skip keyword
 
@@ -173,7 +184,19 @@ c         Check if it is not in an automatic keyword
               exit
             endif
           end do
-          
+
+          if(mndo_usela) then
+            do j=1, nla
+              if(kw(:8) .eq. la_kwd(j)) then
+                write(6, *) "Keyword ",kw(:l), " is handled by Tinker-",
+     &          "MNDO interface. The value found in template will be ",
+     &          "ignored."
+                toadd = .false.
+                exit
+              endif
+            end do
+          end if
+
           do j=1, nskip
             if(kw(:8) .eq. skip_kwd(j)) then
               write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
@@ -215,6 +238,17 @@ c       Now add each automatic keyword
           end do
         end if
 
+        if(mndo_usela) then
+          do i=1, nla
+            write(rch, *) la_prm(i)
+            rch = adjustl(rch)
+            write(key_buffer(mndo_nwk), "(A,'=',A)") 
+     &      la_kwd(i)(:trimtext(la_kwd(i))),
+     &      rch(:trimtext(rch))     
+            mndo_nwk = mndo_nwk + 1
+          end do
+        end if
+
         mndo_nwk = mndo_nwk - 1
         allocate(mndo_keyword(mndo_nwk + nskip))
         do i=1, mndo_nwk
@@ -222,6 +256,65 @@ c       Now add each automatic keyword
           if(mndo_debug) 
      &      write(6, '("(",I3,")  ", A)')
      &      i, mndo_keyword(i)(:trimtext(mndo_keyword(i)))      
+        end do
+      end
+  
+      subroutine mndo_lapos(ila, pos)
+        use atoms
+
+        implicit none
+
+        integer :: ila
+        real*8 :: pos(3)
+
+        integer :: imm, iqm 
+        real*8 :: dp(3), mmp(3), qmp(3)
+
+        imm = mndo_lamm(ila)
+        iqm = mndo_laqm(ila)
+
+        qmp(1) = x(iqm)
+        qmp(2) = y(iqm)
+        qmp(3) = z(iqm)
+
+        mmp(1) = x(imm)
+        mmp(2) = y(imm)
+        mmp(3) = z(imm)
+        
+        dp = mmp - qmp
+        pos = qmp + distqmla/norm2(dp)*dp
+      end
+
+      subroutine mndo_laproj(laforces)
+        use atoms
+        use deriv
+
+        implicit none
+
+        real*8 :: laforces(3,mndo_nla)
+
+        integer :: ila, imm, iqm
+        real*8 :: np(3), proj(3), mmp(3), qmp(3), g
+
+        do ila=1, mndo_nla
+          imm = mndo_lamm(ila)
+          iqm = mndo_laqm(ila)
+
+          qmp(1) = x(iqm)
+          qmp(2) = y(iqm)
+          qmp(3) = z(iqm)
+
+          mmp(1) = x(imm)
+          mmp(2) = y(imm)
+          mmp(3) = z(imm)
+
+          np = (mmp - qmp) / norm2(mmp - qmp)
+          proj = sum(laforces(:,ila) * np)
+          g = distqmla/norm2(mmp - qmp)
+
+          demndo(:,iqm) = demndo(:,iqm) + g*proj*np +
+     &                    (1.0-g)*laforces(:,ila)
+          demndo(:,imm) = demndo(:,imm) - g*proj*np + g*laforces(:,ila)
         end do
       end
 
