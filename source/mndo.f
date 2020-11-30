@@ -10,9 +10,10 @@
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999
-      logical, parameter :: iter_guess = .true., mndo_debug = .true.
+      logical, parameter :: mndo_debug = .true.
      
       character(len=1024) :: mndo_exe, template_fname, mndo_postexe
+      logical :: mndo_iterguess
 
 
       integer :: nqmatoms
@@ -95,7 +96,7 @@ c       A smart check should be done
 
         character(len=128) :: key_buffer(1024)
 
-        integer, parameter :: nauto = 7, nskip = 1
+        integer, parameter :: nauto = 7, nskip = 1, nitgu = 3
         character(len=128) :: automatic_kwd(nauto) = (/
 c       1         2         3         4         5         6
      &  "iform ", "mminp ", "numatm", "mmcoup", "mmskip", "nsav15",
@@ -108,6 +109,12 @@ c       7         8         9         10        11        12
 c       1         2         3         4         5         6
      &  "jop   "
      &  /)
+
+        character(len=128) :: itgu_kwd(nitgu) = (/
+c       1         2         3         4         5         6
+     &  "ipubo ", "ktrial", "imomap"
+     &  /)
+        integer :: itgu_prm(nitgu) = (/ 1, 11, 3 /)
         
         integer :: i, j, k, l, prm
         character(len=128) :: rch, kw
@@ -157,6 +164,16 @@ c         Check if it is not in an automatic keyword
             endif
           end do
           
+          do j=1, nitgu
+            if(kw(:8) .eq. itgu_kwd(j)) then
+              write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
+     &        "MNDO interface. The value found in template will be ",
+     &        "ignored."
+              toadd = .false.
+              exit
+            endif
+          end do
+          
           do j=1, nskip
             if(kw(:8) .eq. skip_kwd(j)) then
               write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
@@ -186,6 +203,17 @@ c       Now add each automatic keyword
      &    rch(:trimtext(rch))     
           mndo_nwk = mndo_nwk + 1
         end do
+        
+        if(mndo_iterguess) then
+          do i=1, nitgu
+            write(rch, *) itgu_prm(i)
+            rch = adjustl(rch)
+            write(key_buffer(mndo_nwk), "(A,'=',A)") 
+     &      itgu_kwd(i)(:trimtext(itgu_kwd(i))),
+     &      rch(:trimtext(rch))     
+            mndo_nwk = mndo_nwk + 1
+          end do
+        end if
 
         mndo_nwk = mndo_nwk - 1
         allocate(mndo_keyword(mndo_nwk + nskip))

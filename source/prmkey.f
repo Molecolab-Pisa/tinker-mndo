@@ -195,12 +195,15 @@ c
          use_mndo = .true.
          ismndoinit = .false.
          mndo_dope = .false.
+         mndo_iterguess = .true.
          mndo_exe = mndo_default_exe
          template_fname = mndo_default_template
          
          if(mndo_debug) write(6, *) "MNDO will be used!"
       else if (keyword(1:8) .eq. 'MNDOEXE ') then
          mndo_exe = adjustl(text(8:)) 
+      else if (keyword(1:16) .eq. 'MNDONOITERGUESS ') then
+         mndo_iterguess = .false.
       else if (keyword(1:13) .eq. 'MNDOTEMPLATE ') then
          template_fname = adjustl(text(13:))
       else if (keyword(1:12) .eq. 'MNDOPOSTEXE ') then

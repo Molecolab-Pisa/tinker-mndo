@@ -109,6 +109,7 @@ c       Sanity check
           if(mndo_dope) 
      &      write(6, *) "  MNDO POST EXECUTION SCRIPT: ",
      &      mndo_postexe(:trimtext(mndo_postexe))
+          if(mndo_iterguess) write(6, *) "  MNDO ITER GUESS IS ON"
           write(6, *) "===================="
         end if
         write(6, *) "+++ MNDO INITIALIZATION FINISHED +++"
