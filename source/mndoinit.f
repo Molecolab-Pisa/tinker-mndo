@@ -5,7 +5,7 @@
         implicit none
       
         integer :: i, j, imm, l, ios, isec, temp_nat, mndot_nline,
-     $  mndot_oline, mndot_eline
+     $  mndot_oline
         logical :: file_exists
         character(len=1024), allocatable :: mndo_template(:)
 
@@ -13,6 +13,7 @@
        
         write(6, *) "+++ MNDO INITIALIZATION +++"
 
+c       Build MM/QM atoms list
         imm = 1
         do i=1, n
           isqm(i) = .false.
@@ -25,6 +26,9 @@
           end if
         end do
 
+        call mndolainit
+
+c       Read template file and save keyword
         inquire(file=template_fname, exist=file_exists)
         if(.not. file_exists) then
           write(6, *) "Template file for MNDO (",
@@ -52,7 +56,7 @@
           
         close(temp_unit)
 
-        mndot_eline = 0
+        mndo_neline = 0
         mndot_oline = 0
         temp_nat = 0
         isec = 0
@@ -60,52 +64,48 @@
         do i=1, mndot_nline
           l = trimtext(mndo_template(i))
           if (isec .eq. 0) then
-c            write(6, *) '(O)  '
+            if(mndo_debug) write(6, "(A)", advance="no" ) '(O)  '
             mndot_oline = mndot_oline + 1
             if (mndo_template(i)(l:l) .ne. '+') isec = 1
           else if (isec .eq. 1) then
-c            write(6, *) '(H)  '
+            if(mndo_debug) write(6, "(A)", advance="no" ) '(H)  '
             if (i .eq. mndot_oline + 2) isec = 2
           else if (isec .eq. 2) then
-c            write(6, *) '(C)  '
+            if(mndo_debug) write(6, "(A)", advance="no" ) '(C)  '
             if (l .eq. 0) then
               isec = 3
             else 
               temp_nat = temp_nat + 1
             end if
           else if (isec .eq. 3) then
-c            write(6, *) '(E) '
-            mndot_eline = mndot_eline + 1
+            if(mndo_debug) write(6, "(A)", advance="no" ) '(E)  '
+            mndo_neline = mndo_neline + 1
+            mndo_eline(mndo_neline) = mndo_template(i)
           else 
-c            write(6, *) '(?)  '
+            if(mndo_debug) write(6, "(A)", advance="no" ) '(?)  '
           end if
-c          write(6,*) mndo_template(i)(:l)
+            if(mndo_debug) write(6, "(A)") mndo_template(i)(:l) 
         end do
 
 c       Check keyword
         call mndo_parse_key(mndo_template, mndot_oline)
 
-c       Copy "extra" lines
-        do i=1, mndot_eline
-          mndo_eline(i) = mndo_template(mndot_oline+nqmatoms+3+i)
-        end do
-        mndo_neline = mndot_eline
+c       Sanity check of template
+c        if (temp_nat .ne. nqmatoms+mndo_nla) then
+c          write(6, *) "Wrong number of QM atoms in template"
+c          write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
+c          call fatal
+c        end if
 
-c       Sanity check
-        if (temp_nat .ne. nqmatoms) then
-          write(6, *) "Wrong number of QM atoms in template"
-          write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
-          call fatal
-        end if
-        
+c       Debug information        
         if(mndo_debug) then
           write(6, *) "=== MNDO OPTIONS ==="
           write(6, *) "  MNDO TEMPLATE: ",
      &      template_fname(:trimtext(template_fname))
           write(6, *) "  MNDO EXECUTABLE: ",
      &      mndo_exe(:trimtext(mndo_exe))
-          write(6, "('   QM ATOMS: ', I4)") nqmatoms
-          write(6, "('   QM ATOMS: ', I5)") n - nqmatoms
+          write(6, "('   QM ATOMS: ', I5)") nqmatoms
+          write(6, "('   MM ATOMS: ', I5)") n - nqmatoms
           if(mndo_dope) 
      &      write(6, *) "  MNDO POST EXECUTION SCRIPT: ",
      &      mndo_postexe(:trimtext(mndo_postexe))
