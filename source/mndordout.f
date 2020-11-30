@@ -90,11 +90,13 @@ c     Insert some sanity check here
 c         Check if you found the correct number of atoms
           if(if_natqm .ne. nqmatoms) then
             sck_passed = .false.
-            write(6, *) "Wrong number of QM atoms in ", mndo_intfi
+            write(6, *) "Wrong number of QM atoms in ", 
+     &      mndo_intfi(:trimtext(mndo_intfi))
           end if
-          if(if_natmm + nqmatoms .ne. n) then
+          if(if_natmm + nqmatoms .ne. n .and. n .ne. nqmatoms) then
             sck_passed = .false. 
-            write(6, *) "Wrong number of MM atoms in ", mndo_intfi
+            write(6, *) "Wrong number of MM atoms in ", 
+     &      mndo_intfi(:trimtext(mndo_intfi))
           end if
 
 c         Check if the norm of QM atoms' gradiend is equal to the one in

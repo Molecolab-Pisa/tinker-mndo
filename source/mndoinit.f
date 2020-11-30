@@ -27,7 +27,8 @@
 
         inquire(file=template_fname, exist=file_exists)
         if(.not. file_exists) then
-          write(6, *) "Template file for MNDO does not exist."
+          write(6, *) "Template file for MNDO (",
+     &    template_fname(:trimtext(template_fname)), ") does not exist."
           call fatal
         end if
 
@@ -96,7 +97,20 @@ c       Sanity check
           write(6, *) "TEMPLATE ", temp_nat, "KEYFILE ", nqmatoms
           call fatal
         end if
-
+        
+        if(mndo_debug) then
+          write(6, *) "=== MNDO OPTIONS ==="
+          write(6, *) "  MNDO TEMPLATE: ",
+     &      template_fname(:trimtext(template_fname))
+          write(6, *) "  MNDO EXECUTABLE: ",
+     &      mndo_exe(:trimtext(mndo_exe))
+          write(6, "('   QM ATOMS: ', I4)") nqmatoms
+          write(6, "('   QM ATOMS: ', I5)") n - nqmatoms
+          if(mndo_dope) 
+     &      write(6, *) "  MNDO POST EXECUTION SCRIPT: ",
+     &      mndo_postexe(:trimtext(mndo_postexe))
+          write(6, *) "===================="
+        end if
         write(6, *) "+++ MNDO INITIALIZATION FINISHED +++"
 
         ismndoinit = .true.

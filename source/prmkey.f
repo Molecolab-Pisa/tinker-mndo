@@ -192,9 +192,20 @@ c
          use_extra = .true.
          if (value .eq. 'NONE')  use_extra = .false.
       else if (keyword(1:7) .eq. 'MNDOMM ') then
-         write(6, *) "MNDO will be used!"
          use_mndo = .true.
-         ismndoinit = .false. 
+         ismndoinit = .false.
+         mndo_dope = .false.
+         mndo_exe = mndo_default_exe
+         template_fname = mndo_default_template
+         
+         if(mndo_debug) write(6, *) "MNDO will be used!"
+      else if (keyword(1:8) .eq. 'MNDOEXE ') then
+         mndo_exe = adjustl(text(8:)) 
+      else if (keyword(1:13) .eq. 'MNDOTEMPLATE ') then
+         template_fname = adjustl(text(13:))
+      else if (keyword(1:12) .eq. 'MNDOPOSTEXE ') then
+         mndo_postexe = adjustl(text(12:))
+         mndo_dope = .true.
       end if
 c
 c     select the name of the force field parameter set

@@ -3,18 +3,21 @@
 
       implicit none
       character(len=1024), parameter ::
-     & mndo_exe = "/home/mattia/work_tmp/MNDO2020/mndo2020/mndo2020",
      & mndo_in = "tmp_mndo.inp",
      & mndo_out = "tmp_mndo.out", 
      & mndo_intfi = "fort.15",
-     & template_fname = 'template.inp'
+     & mndo_default_exe = "mndo2020",
+     & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999
-      logical, parameter :: iter_guess = .true.
+      logical, parameter :: iter_guess = .true., mndo_debug = .true.
+     
+      character(len=1024) :: mndo_exe, template_fname, mndo_postexe
+
 
       integer :: nqmatoms
       integer :: qmlist(maxatm), mmlist(maxatm)
-      logical :: isqm(maxatm), ismndoinit
+      logical :: isqm(maxatm), ismndoinit, mndo_dope
       
       integer :: mndo_nwk, mndo_neline
       character(len=128), allocatable :: mndo_keyword(:), mndo_eline(:)
