@@ -198,6 +198,8 @@ c        TODO move these somwhere else...
          mndo_dope = .false.
          mndo_iterguess = .true.
          mndo_multistate = .false.
+         mndo_currentstate = 0
+         mndo_states(1:mndo_maxs) = 0
 
          mndo_exe = mndo_default_exe
          template_fname = mndo_default_template
@@ -214,10 +216,9 @@ c        TODO move these somwhere else...
          mndo_dope = .true.
       else if (keyword(1:11) .eq. 'MNDOSTATES ') then
          mndo_multistate = .true.
-         read(keyword(11:), "(5I10)") mndo_states
+         read(record(11:), *, err=10, end=10) mndo_states(1:mndo_maxs)
       else if (keyword(1:17) .eq. 'MNDOCURRENTSTATE ') then
-         read(keyword(17:), "(I17)") mndo_currentstate
-
+         read(record(17:), *, err=10, end=10) mndo_currentstate
       end if
 c
 c     select the name of the force field parameter set

@@ -90,6 +90,57 @@ c       Read template file and save keyword
 c       Check keyword
         call mndo_parse_key(mndo_template, mndot_oline)
 
+c       Handle multi-states calculations
+        if(mndo_multistate) then
+          if(mndo_kci .ne. 5) then
+            write(6, *) "Multi-state calculations are only implemented",
+     &      "with GUGA-CI post-HF treatment (kci=5). You should ",
+     &      "specify and configure such a calculation in your template",
+     &      " to proceed."
+            call fatal
+          end if
+
+          mndo_nstates = 0
+          do i=1, mndo_maxs
+            if(mndo_states(i) .lt. 1) exit
+            mndo_nstates = mndo_nstates + 1
+
+            do j=i+1, mndo_maxs
+              if(mndo_states(j) .eq. mndo_states(i)) then
+                write(6, *) "All specified state for MNDO multistate ",
+     &          "should be different!"
+                call fatal
+              end if
+            end do
+          end do
+
+          if(mndo_nstates .lt. 1) then
+            write(6, *) "You should specify at least two states for ",
+     &      "MNDO multistate calculation."
+            call fatal
+          end if
+
+          do i=1, mndo_nstates
+            if(mndo_currentstate .eq. mndo_states(i)) exit
+          end do
+
+          if(i .gt. mndo_nstates) then
+            write(6, *) "Requested states should be within the ",
+     &      "computed ones."
+            call fatal
+          end if
+
+c         add missing keywords
+          call mndomskey(1)
+
+        else if(mndo_kci .gt. 0) then
+          if(mndo_icross .gt. 0) then
+            write(6, *) "icross!=0 is only allowed for multistate ",
+     &      "calculations!"
+            call fatal
+          end if
+        end if
+
 c       Debug information        
         if(mndo_debug) then
           write(6, *) "=== MNDO OPTIONS ==="

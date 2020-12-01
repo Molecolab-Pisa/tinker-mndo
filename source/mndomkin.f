@@ -45,6 +45,10 @@ c           write down coordinates of LAs
         end if
 
         write(mndo_in_unit, *) ""
+        
+        if(mndo_multistate) then
+          write(mndo_in_unit, "(5I4)") mndo_states(:mndo_nstates)
+        end if
 
         do i=1, mndo_neline
           l = trimtext(mndo_eline(i))

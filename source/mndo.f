@@ -9,12 +9,11 @@
      & mndo_default_exe = "mndo2020",
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
-     & temp_unit=999
+     & temp_unit=999, mndo_maxs=5
       logical, parameter :: mndo_debug = .true.
       
       real*8, parameter :: distqmla = 1.00
 
-     
       character(len=1024) :: mndo_exe, template_fname, mndo_postexe
       logical :: mndo_iterguess
 
@@ -24,8 +23,8 @@
      &           mndo_lamm(maxatm) 
       logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
 
-      integer :: mndo_nstates, mndo_currentstate, mndo_states(5), 
-     &           mndo_kci
+      integer :: mndo_nstates, mndo_currentstate, 
+     &           mndo_states(mndo_maxs), mndo_kci, mndo_icross
       logical :: mndo_multistate
       
       integer :: mndo_nwk, mndo_neline
@@ -142,6 +141,9 @@ c       1         2         3         4         5         6
           automatic_prm(4) = 0
         end if
         if(mndo_usela) la_prm(2) = mndo_nla
+        
+        mndo_kci = 0
+        mndo_icross = 0
 
 c       Check and remove unneeded automatic and skip keyword
 
@@ -168,6 +170,7 @@ c       Check and remove unneeded automatic and skip keyword
           l = trimtext(kw)
          
           if(kw(:8) .eq. 'kci   ') mndo_kci = prm
+          if(kw(:8) .eq. 'icross') mndo_icross = prm
 
 c         Check if it is not in an automatic keyword
           toadd = .true.
@@ -256,6 +259,90 @@ c       Now add each automatic keyword
         end if
 
         mndo_nwk = mndo_nwk - 1
+        allocate(mndo_keyword(mndo_nwk + nskip))
+        do i=1, mndo_nwk
+          mndo_keyword(i) = key_buffer(i)
+          if(mndo_debug) 
+     &      write(6, '("(",I3,")  ", A)')
+     &      i, mndo_keyword(i)(:trimtext(mndo_keyword(i)))      
+        end do
+      end
+
+      subroutine mndomskey(new_icross) 
+        implicit none
+
+        integer :: new_icross
+
+        character(len=128) :: key_buffer(1024)
+
+        integer, parameter :: nauto = 3, nskip = 1
+        character(len=128) :: automatic_kwd(nauto) = (/
+c       1         2         3         4         5         6
+     &  "icross", "ncigrd", "iroot "
+     &  /)
+        integer :: automatic_prm(nauto) = (/ 0, 0, 0 /)
+
+        integer :: i, j, k, l, nwk, prm
+        character(len=128) :: rch, kw
+        logical :: toadd
+
+        integer trimtext
+
+        automatic_prm(1) = new_icross
+        automatic_prm(2) = mndo_nstates
+        automatic_prm(3) = 0
+        do i=1, mndo_nstates
+          if(mndo_states(i) .gt. automatic_prm(3))
+     &      automatic_prm(3) = mndo_states(i)     
+        end do
+
+        nwk = 0
+        do i=1, mndo_nwk
+          l = trimtext(mndo_keyword(i))
+
+          do j=1, l
+            if(mndo_keyword(i)(j:j) .eq. '=') exit
+          end do
+
+          kw = mndo_keyword(i)(:j-1)
+          kw(j:) = ' '
+          read(mndo_keyword(i)(j+1:l),'(I10)') prm
+          l = trimtext(kw)
+         
+c         Check if it is not in an automatic keyword
+          toadd = .true.
+          do j=1, nauto
+            if(kw(:8) .eq. automatic_kwd(j)) then
+              write(6, *) "Keyword ", kw(:l), " is handled by Tinker-",
+     &        "MNDO interface. The value found in template will be ",
+     &        "ignored."
+              toadd = .false.
+              exit
+            endif
+          end do
+          
+          if(toadd) then
+            nwk = nwk + 1
+            write(rch, *) prm
+            rch = adjustl(rch)
+            write(key_buffer(nwk), "(A,'=',A)") 
+     &      kw(:l),
+     &      rch(:trimtext(rch))     
+          end if
+        end do
+
+c       Now add each automatic keyword
+        do i=1, nauto
+          nwk = nwk + 1
+          write(rch, *) automatic_prm(i)
+          rch = adjustl(rch)
+          write(key_buffer(nwk), "(A,'=',A)") 
+     &    automatic_kwd(i)(:trimtext(automatic_kwd(i))),
+     &    rch(:trimtext(rch))     
+        end do
+        
+        mndo_nwk = nwk
+        deallocate(mndo_keyword)
         allocate(mndo_keyword(mndo_nwk + nskip))
         do i=1, mndo_nwk
           mndo_keyword(i) = key_buffer(i)
