@@ -539,6 +539,7 @@ OBJS =	action.o \
 	mndolainit.o \
 	mndomkin.o \
 	mndordout.o \
+	mndordmsout.o \
 	mol2xyz.o \
 	molcul.o \
 	moldyn.o \
@@ -1442,6 +1443,7 @@ libtinker.a: ${OBJS}
 	mndolainit.o \
 	mndomkin.o \
 	mndordout.o \
+	mndordmsout.o \
 	molcul.o \
 	moldyn.o \
 	molecule.o \

@@ -33,7 +33,11 @@ c       Run MNDO
         status = system(command)
 
 c       Read the output to populate emndo demndo
-        call mndordout(.true.)
+        if(mndo_multistate) then
+          call mndordmsout()
+        else
+          call mndordout(.true.)
+        end if
 
 c       Post-execution script
         if(mndo_dope) then
