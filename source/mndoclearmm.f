@@ -44,13 +44,13 @@ c     strip angles: nangle, iang, anglist, balist
 c
       new_index = 0
       maxang = 6*n
-      allocate(iscratch(4,maxang))
+      allocate(iscratch(4,maxang),jscratch(2,maxang))
       do i = 1, nangle
         iat = iang(1,i)
         jat = iang(2,i)
         kat = iang(3,i)
 c       lat can either be 0 for plain angles or an index for 
-c       pyramidalizations, in either case it's okay don't checking it
+c       pyramidalizations, in either case it's okay not checking it
         lat = iang(4,i)
 
         nqm = 0
@@ -66,9 +66,11 @@ c       pyramidalizations, in either case it's okay don't checking it
           iscratch(3,new_index) = kat
           iscratch(4,new_index) = lat
           anglist(:,iat) = 0
+          jscratch(:,new_index) = balist(:,i)
         end if
       end do
       nangle = new_index
       iang = iscratch
-      deallocate(iscratch)
+      balist = jscratch
+      deallocate(iscratch,jscratch)
       end
