@@ -75,6 +75,7 @@ c
       use molcul
       use shunt
       use usage
+      use mndo
       implicit none
       integer i,j,k
       integer ii,in,ic,im
@@ -167,6 +168,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nion
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             km = molcule(k)
@@ -302,6 +304,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nion
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             proceed = .true.
@@ -440,6 +443,7 @@ c
       use molcul
       use shunt
       use usage
+      use mndo
       implicit none
       integer i,j,k
       integer ii,in,ic,im
@@ -580,6 +584,7 @@ c
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kmap)
             kc = kion(kmap)
             km = molcule(k)
@@ -752,6 +757,7 @@ c
       use neigh
       use shunt
       use usage
+      use mndo
       implicit none
       integer i,j,k,kkk
       integer ii,in,ic,im
@@ -815,7 +821,7 @@ c
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
-!$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
+!$OMP& firstprivate(cscale) shared (ec,nec,aec,einter,isqm)
 !$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
 c
 c     compute and partition the charge interaction energy
@@ -855,6 +861,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             km = molcule(k)

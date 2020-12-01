@@ -70,6 +70,7 @@ c
       use shunt
       use usage
       use virial
+      use mndo
       implicit none
       integer i,j,k
       integer ii,in,ic
@@ -155,6 +156,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nion
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             proceed = .true.
@@ -319,6 +321,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nion
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             proceed = .true.
@@ -485,6 +488,7 @@ c
       use shunt
       use usage
       use virial
+      use mndo
       implicit none
       integer i,j,k
       integer ii,in,ic
@@ -617,6 +621,7 @@ c
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kmap)
             kc = kion(kmap)
             prime = (kk .le. nion)
@@ -803,6 +808,7 @@ c
       use shunt
       use usage
       use virial
+      use mndo
       implicit none
       integer i,j,k,kkk
       integer ii,in,ic
@@ -860,7 +866,7 @@ c
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,
 !$OMP& f6,f7,ebuffer)
-!$OMP& firstprivate(cscale) shared (ec,dec,vir)
+!$OMP& firstprivate(cscale) shared (ec,dec,vir,isqm)
 !$OMP DO reduction(+:ec,dec,vir) schedule(guided)
 c
 c     compute the charge interaction energy and first derivatives
@@ -899,6 +905,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             proceed = .true.

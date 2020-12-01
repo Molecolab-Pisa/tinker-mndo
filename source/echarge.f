@@ -66,6 +66,7 @@ c
       use group
       use shunt
       use usage
+      use mndo
       implicit none
       integer i,j,k
       integer ii,in,ic
@@ -141,6 +142,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nion
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             proceed = .true.
@@ -247,6 +249,7 @@ c
 c     decide whether to compute the current interaction
 c
          do kk = ii, nion
+            if (isqm(i).or.isqm(k)) cycle
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
@@ -353,6 +356,7 @@ c
       use light
       use shunt
       use usage
+      use mndo
       implicit none
       integer i,j,k
       integer ii,in,ic
@@ -475,6 +479,7 @@ c
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kmap)
             kc = kion(kmap)
             prime = (kk .le. nion)
@@ -601,6 +606,7 @@ c
       use neigh
       use shunt
       use usage
+      use mndo
       implicit none
       integer i,j,k,kkk
       integer ii,in,ic
@@ -648,7 +654,7 @@ c
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP& ebuffer)
-!$OMP& firstprivate(cscale) shared (ec)
+!$OMP& firstprivate(cscale) shared (ec,isqm)
 !$OMP DO reduction(+:ec) schedule(guided)
 c
 c     calculate the charge interaction energy term
@@ -687,6 +693,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = iion(kk)
+            if (isqm(i).or.isqm(k)) cycle
             kn = jion(kk)
             kc = kion(kk)
             proceed = .true.
