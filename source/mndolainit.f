@@ -26,7 +26,7 @@ c       Find out if a link atom is needed
           end do
         end do
         
-        if(mndo_debug) then
+        if(mndo_debug .and. mndo_nla .gt. 0) then
           write(6, *) ""
           write(6, *) "Link atom table"
           write(6, *) "|  QM  |  MM  |"
