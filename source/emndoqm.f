@@ -32,8 +32,12 @@ c       Run MNDO
         if(mndo_debug) write(6, *) command(:trimtext(command))
         status = system(command)
 
-c       Read the output to populate emndo demndo
-        call mndordout(.false.)
+c       Read the output to populate emndo
+        if(mndo_multistate) then
+          call mndordmsout()
+        else
+          call mndordout(.false.)
+        end if
 
 c       Post-execution script
         if(mndo_dope) then
