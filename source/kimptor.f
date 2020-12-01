@@ -145,9 +145,11 @@ c
                if (isqm(ib)) nqm = nqm + 1
                if (isqm(ic)) nqm = nqm + 1
                if (isqm(id)) nqm = nqm + 1
-               if (nqm.gt.1 .and. nqm.ne.4) write(iout,*) 
-     &         ' WARNING: improper torsion between MM and QM.'
-               write(iout,*) ' ignoring this force field term.'
+               if (nqm.gt.1 .and. nqm.ne.4) then
+                 write(iout,*) 
+     &           ' WARNING: improper torsion between MM and QM.'
+                 write(iout,*) ' ignoring this force field term.'
+               end if
                if (nqm.gt.1) cycle
                ita = class(ia)
                itb = class(ib)

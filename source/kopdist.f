@@ -148,9 +148,11 @@ c
                  if (isqm(ib)) nqm = nqm + 1
                  if (isqm(ic)) nqm = nqm + 1
                  if (isqm(id)) nqm = nqm + 1
-                 if (nqm.ne.4) write(iout,*) 
-     &           ' WARNING: oop distance between MM and QM.'
-                 write(iout,*) ' ignoring this force field term.'
+                 if (nqm.ne.4) then
+                   write(iout,*) 
+     &             ' WARNING: oop distance between MM and QM.'
+                   write(iout,*) ' ignoring this force field term.'
+                 end if
                  cycle
                end if
                ita = class(ia)
