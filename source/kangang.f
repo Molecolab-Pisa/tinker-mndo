@@ -29,6 +29,7 @@ c
       use keys
       use potent
       use tors
+      use mndo
       implicit none
       integer i,j,k,m,next
       integer it,ia,ic
@@ -96,11 +97,13 @@ c
                m = 1
                if (atomic(ia) .le. 1)  m = m + 1
                if (atomic(ic) .le. 1)  m = m + 1
+               if (isqm(ia).or.isqm(ic)) cycle
                fa = anan(m,it)
                do k = j+1, nang
                   kang = anglist(k,i)
                   ia = iang(1,kang)
                   ic = iang(3,kang)
+                  if (isqm(ia).or.isqm(ic)) cycle
                   m = 1
                   if (atomic(ia) .le. 1)  m = m + 1
                   if (atomic(ic) .le. 1)  m = m + 1
