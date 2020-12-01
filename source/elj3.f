@@ -102,6 +102,7 @@ c
       use usage
       use vdw
       use vdwpot
+      use mndo
       implicit none
       integer i,j,k
       integer ii,iv,it
@@ -198,6 +199,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -333,6 +335,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -481,6 +484,7 @@ c
       use usage
       use vdw
       use vdwpot
+      use mndo
       implicit none
       integer i,j,k
       integer ii,iv,it
@@ -623,6 +627,7 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             prime = (kk .le. nvdw)
 c
@@ -797,6 +802,7 @@ c
       use usage
       use vdw
       use vdwpot
+      use mndo
       implicit none
       integer i,j,k
       integer ii,iv,it
@@ -869,7 +875,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
+!$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter,isqm)
 !$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c
 c     find the van der Waals energy via neighbor list search
@@ -903,6 +909,7 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -1076,6 +1083,7 @@ c
       use vdw
       use vdwpot
       use warp
+      use mndo
       implicit none
       integer i,j,k
       integer ii,iv,it
@@ -1178,6 +1186,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
