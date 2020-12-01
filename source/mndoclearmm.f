@@ -37,7 +37,9 @@ c     for the moment it's better to make a scratch copy of ibnd
         end if
       end do
       nbond = new_index
-      ibnd = iscratch
+      
+      if(mndo_debug) write(6, "('Found ', I4, ' bonds')") nbond
+      ibnd = iscratch(:,:)
       deallocate(iscratch)
 c
 c     strip angles: nangle, iang, anglist, balist
@@ -70,7 +72,9 @@ c       pyramidalizations, in either case it's okay not checking it
         end if
       end do
       nangle = new_index
-      iang = iscratch
-      balist = jscratch
+      iang = iscratch(:,:)
+      balist = jscratch(:,:)
+      if(mndo_debug) write(6, "('Found ', I4, ' angles')") nangle
+      iang = iscratch(3,nangle)
       deallocate(iscratch,jscratch)
       end
