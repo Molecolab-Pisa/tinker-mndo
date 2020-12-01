@@ -26,12 +26,13 @@ c
       use ktrtor
       use potent
       use tortor
+      use mndo
       implicit none
       integer i,j,k,m
       integer ia,ib,ic,id,ie
       integer ita,itb,itc,itd,ite
       integer size,next,ntt
-      integer nx,ny,nxy
+      integer nx,ny,nxy,nqm
       real*8 eps
       real*8 tx(maxtgrd2)
       real*8 ty(maxtgrd2)
@@ -253,6 +254,17 @@ c
          ic = ibitor(3,i)
          id = ibitor(4,i)
          ie = ibitor(5,i)
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (isqm(ie)) nqm = nqm + 1
+c        if (nqm.gt.2 .and. nqm.ne.5) then
+c          write(iout,*) ' WARING - tor-tor term across a link atom!'
+c          write(iout,*) ' Skipping this force field term.'
+c        end if
+         if (nqm.gt.2) cycle
          ita = class(ia)
          itb = class(ib)
          itc = class(ic)

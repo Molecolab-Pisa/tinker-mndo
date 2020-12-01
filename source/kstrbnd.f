@@ -30,9 +30,10 @@ c
       use kstbnd
       use potent
       use strbnd
+      use mndo
       implicit none
       integer i,j,k,nsb
-      integer ia,ib,ic
+      integer ia,ib,ic,nqm
       integer ita,itb,itc
       integer nba,nbc
       integer size,next
@@ -131,6 +132,11 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
+            nqm = 0
+            if (isqm(ia)) nqm = nqm + 1 
+            if (isqm(ib)) nqm = nqm + 1 
+            if (isqm(ic)) nqm = nqm + 1 
+            if (nqm.ge.2) cycle
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)

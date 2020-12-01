@@ -27,9 +27,10 @@ c
       use kurybr
       use potent
       use urey
+      use mndo
       implicit none
       integer i,j,nu
-      integer ia,ib,ic
+      integer ia,ib,ic,nqm
       integer ita,itb,itc
       integer size,next
       real*8 bb,tt
@@ -119,6 +120,15 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
+c
+c           skip if there are more than a qm atom
+c
+            nqm = 0
+            if (isqm(ia)) nqm = nqm + 1
+            if (isqm(ib)) nqm = nqm + 1
+            if (isqm(ic)) nqm = nqm + 1
+            if (nqm.ge.2) cycle
+c
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)

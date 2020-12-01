@@ -28,9 +28,10 @@ c
       use potent
       use strtor
       use tors
+      use mndo
       implicit none
       integer i,j,k,nbt
-      integer ia,ib,ic,id
+      integer ia,ib,ic,id,nqm
       integer ita,itb,itc,itd
       integer size,next
       real*8 bt1,bt2,bt3
@@ -161,6 +162,16 @@ c
             ib = itors(2,i)
             ic = itors(3,i)
             id = itors(4,i)
+c
+c           skip if there is more than a QM atom
+c
+            nqm = 0
+            if (isqm(ia)) nqm = nqm + 1
+            if (isqm(ib)) nqm = nqm + 1
+            if (isqm(ic)) nqm = nqm + 1
+            if (isqm(id)) nqm = nqm + 1
+            if (nqm.ge.2) cycle
+c
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)

@@ -29,11 +29,12 @@ c
       use potent
       use tors
       use usage
+      use mndo
       implicit none
       integer i,j
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
-      integer nt,nt5,nt4
+      integer nt,nt5,nt4,nqm
       integer size,next
       integer iring,minat
       integer nlist,ilist
@@ -282,6 +283,12 @@ c
          tors5(2,i) = 0.0d0
          tors6(1,i) = 0.0d0
          tors6(2,i) = 0.0d0
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.ge.3) cycle
          done = .false.
 c
 c     make a check for torsions inside small rings

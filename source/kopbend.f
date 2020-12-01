@@ -30,8 +30,9 @@ c
       use opbend
       use potent
       use usage
+      use mndo
       implicit none
-      integer i,j,it
+      integer i,j,it,nqm
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
       integer nopb,size
@@ -69,6 +70,20 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,fopb
    10       continue
+c
+c           parameters not needed if two or more atoms are qm
+c
+c           nqm = 0
+c           if (isqm(ia)) nqm = nqm + 1
+c           if (isqm(ib)) nqm = nqm + 1
+c           if (isqm(ic)) nqm = nqm + 1
+c           if (isqm(id)) nqm = nqm + 1
+c           if (nqm.ge.2) then
+c             write(iout,*) ' WARNING: oop bend through a link atom'
+c             write(iout,*) ' skipping this force field term.'
+c             cycle
+c           end if
+c
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -158,6 +173,23 @@ c
                itc = class(ic)
                id = iang(4,i)
                itd = class(id)
+c
+c              parameters not needed if two or more atoms are qm
+c
+c              write(6,*) 'iangle =', i
+c              write(6,'(a,8(i4,l2))') 'ia,ib,ic,id=', ia,isqm(ia),
+c    $  ib,isqm(ib),ic,isqm(ic),id,isqm(id)
+               nqm = 0
+               if (isqm(ia)) nqm = nqm + 1
+               if (isqm(ib)) nqm = nqm + 1
+               if (isqm(ic)) nqm = nqm + 1
+               if (isqm(id)) nqm = nqm + 1
+               if (nqm.ge.2 .and. nqm.lt.4) then
+                 write(iout,*) ' WARNING: oop bend through a link atom'
+                 write(iout,*) ' skipping this force field term.'
+               end if
+               if (nqm.ge.2) cycle
+c
                size = 4
                call numeral (ita,pa,size)
                call numeral (itb,pb,size)

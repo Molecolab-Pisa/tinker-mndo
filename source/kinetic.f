@@ -167,6 +167,7 @@ c
       use atoms
       use ielscf
       use usage
+      use mndo
       implicit none
       integer i,j,k,m
       real*8 term

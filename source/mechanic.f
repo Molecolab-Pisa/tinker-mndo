@@ -66,10 +66,9 @@ c     find any pisystem atoms, bonds and torsional angles
 c
       call orbital
 c
-c     strip parameters related to QM atoms
+c     init mndo before most of the rest for the QM list
 c
       call mndoinit
-      call mndoclearmm
 c
 c     assign bond, angle and cross term potential parameters
 c

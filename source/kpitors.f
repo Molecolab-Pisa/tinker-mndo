@@ -28,8 +28,9 @@ c
       use pitors
       use potent
       use tors
+      use mndo
       implicit none
-      integer i,j,npt
+      integer i,j,npt,nqm
       integer ia,ib
       integer ita,itb
       integer size,next

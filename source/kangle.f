@@ -29,8 +29,9 @@ c
       use keys
       use potent
       use usage
+      use mndo
       implicit none
-      integer i,j
+      integer i,j,nqm
       integer ia,ib,ic
       integer ita,itb,itc
       integer na,nap,naf
@@ -403,6 +404,16 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
+c
+c        parameters are not needed if two or more atoms
+c        are qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (nqm.ge.2) cycle
+c
          ita = class(ia)
          itb = class(ib)
          itc = class(ic)
@@ -581,8 +592,9 @@ c
       use merck
       use potent
       use ring
+      use mndo
       implicit none
-      integer i,j,k,l,m
+      integer i,j,k,l,m,nqm
       integer ia,ib,ic
       integer ita,itb,itc
       integer ina,inb,inc
@@ -635,6 +647,16 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
+c
+c        parameters are not needed if two or more atoms
+c        are qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (nqm.ge.2) cycle
+c
          ita = class(ia)
          itb = class(ib)
          itc = class(ic)
