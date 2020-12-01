@@ -39,20 +39,20 @@ c     for the moment it's better to make a scratch copy of ibnd
       nbond = new_index
       
       if(mndo_debug) write(6, "('Found ', I4, ' bonds')") nbond
-      ibnd = iscratch(2,nbond)
+      ibnd = iscratch(:,:)
       deallocate(iscratch)
 c
 c     strip angles: nangle, iang, anglist, balist
 c
       new_index = 0
       maxang = 6*n
-      allocate(iscratch(4,maxang))
+      allocate(iscratch(4,maxang),jscratch(2,maxang))
       do i = 1, nangle
         iat = iang(1,i)
         jat = iang(2,i)
         kat = iang(3,i)
 c       lat can either be 0 for plain angles or an index for 
-c       pyramidalizations, in either case it's okay don't checking it
+c       pyramidalizations, in either case it's okay not checking it
         lat = iang(4,i)
 
         nqm = 0
@@ -68,11 +68,13 @@ c       pyramidalizations, in either case it's okay don't checking it
           iscratch(3,new_index) = kat
           iscratch(4,new_index) = lat
           anglist(:,iat) = 0
+          jscratch(:,new_index) = balist(:,i)
         end if
       end do
       nangle = new_index
-      
+      iang = iscratch(:,:)
+      balist = jscratch(:,:)
       if(mndo_debug) write(6, "('Found ', I4, ' angles')") nangle
       iang = iscratch(3,nangle)
-      deallocate(iscratch)
+      deallocate(iscratch,jscratch)
       end
