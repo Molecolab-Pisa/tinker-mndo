@@ -12,7 +12,7 @@
      & temp_unit=999, mndo_maxs=5
       logical, parameter :: mndo_debug = .true.
       
-      real*8, parameter :: distqmla = 1.00
+      real*8, parameter :: distqmla = 1.00, mndo_l3t=1.0
 
       character(len=1024) :: mndo_exe, template_fname, mndo_postexe
       logical :: mndo_iterguess

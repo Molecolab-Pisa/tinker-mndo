@@ -67,8 +67,8 @@ c
       call orbital
 c
 c     init mndo before most of the rest for the QM list
-c
-      call mndoinit
+c     
+      if(use_mndo) call mndoinit
 c
 c     assign bond, angle and cross term potential parameters
 c

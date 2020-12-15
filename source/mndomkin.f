@@ -12,7 +12,7 @@
         integer trimtext
   
   10   format(i2, 8x, 3(F10.5,2x,i2,6x))
-  20   format(3F12.7,F8.4)
+  20   format(3F12.4,F8.4)
 
         open(unit=mndo_in_unit, file=mndo_in)
 

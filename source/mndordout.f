@@ -174,8 +174,7 @@ c         Check if the computed gradients are OK with Newton 3th law
             end do
           end do
           
-          if(abs(law3(1)) .gt. 1.0e-6 .or. abs(law3(2)) .gt. 1.0e-6 
-     &      .or. abs(law3(3)) .gt. 1.0e-6) then
+          if(norm2(law3) .gt. mndo_l3t) then
             sck_passed = .false.
             write(6, *) "Computed forces does not respect Newton 3th", 
      &      " law."
