@@ -50,7 +50,7 @@
               if(n-nqmatoms .eq. 0) isec = 5
             end if
           else if(isec .eq. 3) then
-            read(line(59:), 10) if_natmm
+            read(line(58:), 10) if_natmm
             isec = 4
           else if(isec .eq. 4) then
             if( trimtext(line) .eq. 0) isec = 5

@@ -59,7 +59,7 @@ c           QM coordinates
             end if
           else if(isec .eq. 3) then
 c           Header of MM coordinates
-            read(line(59:), 10) if_natmm
+            read(line(58:), 10) if_natmm
             isec = 4
           else if(isec .eq. 4) then
 c           MM coordinates
