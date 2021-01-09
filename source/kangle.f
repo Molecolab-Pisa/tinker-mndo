@@ -412,7 +412,10 @@ c
          if (isqm(ia)) nqm = nqm + 1
          if (isqm(ib)) nqm = nqm + 1
          if (isqm(ic)) nqm = nqm + 1
-         if (nqm.ge.2) cycle
+         if (nqm.ge.2) then 
+           angtyp(i) = 'HARMONIC'
+           cycle
+         end if
 c
          ita = class(ia)
          itb = class(ib)
