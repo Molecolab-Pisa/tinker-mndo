@@ -198,8 +198,9 @@ c        TODO move these somwhere else...
          mndo_dope = .false.
          mndo_iterguess = .true.
          mndo_multistate = .false.
+         mndo_ms_all = .false.
          mndo_currentstate = 0
-         mndo_states(1:mndo_maxs) = 0
+         mndo_nstates = 0
 
          mndo_exe = mndo_default_exe
          template_fname = mndo_default_template
@@ -214,9 +215,11 @@ c        TODO move these somwhere else...
       else if (keyword(1:12) .eq. 'MNDOPOSTEXE ') then
          mndo_postexe = adjustl(text(12:))
          mndo_dope = .true.
+      else if (keyword(1:11) .eq. 'MNDOALLGRD ') then
+         mndo_ms_all = .true.
       else if (keyword(1:11) .eq. 'MNDOSTATES ') then
          mndo_multistate = .true.
-         read(record(11:), *, err=10, end=10) mndo_states(1:mndo_maxs)
+         read(record(11:), *, err=10, end=10) mndo_nstates
       else if (keyword(1:17) .eq. 'MNDOCURRENTSTATE ') then
          read(record(17:), *, err=10, end=10) mndo_currentstate
       end if

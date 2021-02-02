@@ -24,8 +24,8 @@
       logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
 
       integer :: mndo_nstates, mndo_currentstate, 
-     &           mndo_states(mndo_maxs), mndo_kci, mndo_icross
-      logical :: mndo_multistate
+     &           mndo_kci, mndo_icross
+      logical :: mndo_multistate, mndo_ms_all
       
       integer :: mndo_nwk, mndo_neline
       character(len=128), allocatable :: mndo_keyword(:), mndo_eline(:)
@@ -275,12 +275,12 @@ c       Now add each automatic keyword
 
         character(len=128) :: key_buffer(1024)
 
-        integer, parameter :: nauto = 3, nskip = 1
+        integer, parameter :: nauto = 4, nskip = 1
         character(len=128) :: automatic_kwd(nauto) = (/
 c       1         2         3         4         5         6
-     &  "icross", "ncigrd", "iroot "
+     &  "icross", "ncigrd", "iroot ", "lroot "
      &  /)
-        integer :: automatic_prm(nauto) = (/ 0, 0, 0 /)
+        integer :: automatic_prm(nauto) = (/ 0, 0, 0, 1 /)
 
         integer :: i, j, k, l, nwk, prm
         character(len=128) :: rch, kw
@@ -289,12 +289,16 @@ c       1         2         3         4         5         6
         integer trimtext
 
         automatic_prm(1) = new_icross
-        automatic_prm(2) = mndo_nstates
-        automatic_prm(3) = 0
-        do i=1, mndo_nstates
-          if(mndo_states(i) .gt. automatic_prm(3))
-     &      automatic_prm(3) = mndo_states(i)     
-        end do
+        if(mndo_ms_all) then
+          automatic_prm(2) = mndo_nstates
+        else
+          automatic_prm(2) = 2
+        end if
+        automatic_prm(3) = mndo_nstates
+        
+        if(mndo_currentstate .gt. 0) then
+          automatic_prm(4) = mndo_currentstate
+        end if
 
         nwk = 0
         do i=1, mndo_nwk

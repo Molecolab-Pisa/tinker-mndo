@@ -9,10 +9,10 @@
         logical, parameter :: dosck = .true.
 
         integer :: i, j, isec, ios, if_natqm, if_natmm, xx, isla, ila,
-     &             if_nstate, istate
+     &             if_nstate, istate, if_istate
         logical :: intfexists, sck_passed
         character(len=1024) :: line
-        real*8 :: mygn, law3(3)
+        real*8 :: mygn, law3(3), yy
         real*8, allocatable :: demndo_la(:,:,:), demndo_tmp(:,:,:), 
      &                         emndo_tmp(:), cgn(:), ign(:)   
         integer, allocatable :: if_states(:)
@@ -66,11 +66,15 @@ c           MM coordinates
             if( trimtext(line) .eq. 0) isec = 5
           else if(isec .eq. 5) then
 c           Header of Energy and Norms
-            write(6, *) ">>>", line(67:)
             read(line(67:), 10) if_nstate
-            if(if_nstate .ne. mndo_nstates) then
+            if(.not. mndo_ms_all .and. if_nstate .ne. 2) then
               write(6, *) "Error number of computed state is not ",
-     &        "consistent with what tinker expects."
+     &        "consistent with what tinker expects (2)."
+              call fatal
+            end if
+            if(mndo_ms_all .and. if_nstate .ne. mndo_nstates) then
+              write(6, *) "Error number of computed state is not ",
+     &        "consistent with what tinker expects (nstates)."
               call fatal
             end if
             isec = 6
@@ -81,7 +85,9 @@ c           Energy and Norms
               isec = 7
               istate = 0
             else
-              read(line, 30) if_states(j), emndo_tmp(j), cgn(j), ign(j)
+              read(line, 30) if_states(j), yy, yy, yy
+              read(line, 30) xx, emndo_tmp(if_states(j)), 
+     &        cgn(if_states(j)), ign(if_states(j))
               j = j+1
             end if
           else if(isec .eq. 7) then
@@ -89,13 +95,19 @@ c           Header of QM gradients
             isec = 8
             j = 1
             ila = 1
+            read(line(30:), *) if_istate 
             istate = istate + 1
+            if(if_states(istate) .ne. if_istate) then
+              write(6, *) "Error while reading QM gradient section.",
+     $        "Expected gradient for a different state."
+              call fatal
+            end if
           else if(isec .eq. 8) then
 c         QM gradients values
             if(trimtext(line) .eq. 0) then
               if(n-nqmatoms .eq. 0) then
 c               Case full QM
-                if(istate .eq. mndo_nstates) then
+                if(istate .eq. if_nstate) then
                   isec = 11
                 else
                   isec = 7
@@ -105,17 +117,19 @@ c               Case full QM
               end if
             else
               if(j .le. nqmatoms) then
-                read(line, 40) xx, xx, demndo_tmp(1, qmlist(j),istate), 
-     $          demndo_tmp(2, qmlist(j),istate), 
-     $          demndo_tmp(3, qmlist(j),istate), isla
+                read(line, 40) xx, xx, 
+     $          demndo_tmp(1, qmlist(j),if_istate), 
+     $          demndo_tmp(2, qmlist(j),if_istate), 
+     $          demndo_tmp(3, qmlist(j),if_istate), isla
                 if(isla .ne. 0) then
                   write(6, *) "Reading a QM atom gradient as a",
      &            " link atom's one. This is a bug."
                   call fatal
                 end if
               else if(j .le. nqmatoms + mndo_nla .and. mndo_usela) then
-                read(line, 40) xx, xx, demndo_la(1,ila,istate), 
-     $          demndo_la(2,ila,istate), demndo_la(3,ila,istate),isla
+                read(line, 40) xx, xx, demndo_la(1,ila,if_istate), 
+     $          demndo_la(2,ila,if_istate), 
+     $          demndo_la(3,ila,if_istate),isla
                 ila = ila + 1
                 if(isla .ne. 1) then
                   write(6, *) "Reading a link atom gradient as a",
@@ -132,18 +146,24 @@ c               Case full QM
           else if(isec .eq. 9) then
 c           MM gradients header
             isec = 10
+            read(line(42:), *) if_istate 
+            if(if_states(istate) .ne. if_istate) then
+              write(6, *) "Error while reading MM gradient section.",
+     $        "Expected gradient for a different state."
+              call fatal
+            end if
             j = 1
           else if(isec .eq. 10) then
             if(trimtext(line) .eq. 0) then
-              if(istate.eq.mndo_nstates) then
+              if(istate.eq.if_nstate) then
                 isec = 11
               else
                 isec = 7
               end if
             else
-              read(line, 40) xx, xx, demndo_tmp(1, mmlist(j),istate), 
-     $        demndo_tmp(2, mmlist(j),istate), 
-     $        demndo_tmp(3, mmlist(j),istate), xx 
+              read(line, 40) xx, xx, demndo_tmp(1, mmlist(j),if_istate), 
+     $        demndo_tmp(2, mmlist(j),if_istate), 
+     $        demndo_tmp(3, mmlist(j),if_istate), xx 
               j = j + 1
             end if
           else
@@ -169,42 +189,38 @@ c         Check if you found the correct number of atoms
 
 c         Check if the norm of QM atoms' gradiend is equal to the one in
 c         output file
-          do istate=1, mndo_nstates
+          do istate=1, if_nstate
             mygn = 0.0
             do i=1, nqmatoms 
               do j=1, 3
-                mygn = mygn + demndo_tmp(j,qmlist(i),istate)**2
+              mygn = mygn + demndo_tmp(j,qmlist(i),if_states(istate))**2
               end do
             end do
 
             if(mndo_usela) then
               do i=1, mndo_nla
                 do j=1, 3
-                  mygn = mygn + demndo_la(j, i,istate)**2
+                mygn = mygn + demndo_la(j, i,if_states(istate))**2
                 end do
               end do
             end if
             mygn = sqrt(mygn)
             
-            if(abs(mygn - cgn(istate)) .gt. 1.0e-7) then
+            if(abs(mygn - cgn(if_states(istate))) .gt. 1.0e-7) then
               sck_passed = .false.
               write(6, *)"Difference between compute and expected norm",
-     $        " of QM atoms' gradient > 1.0e-7; State = ", istate
+     $        " of QM atoms' gradient > 1.0e-7; State = ",
+     $        if_states(istate)
               write(6, "('Found= ', F12.6, '  Computed= ', F12.6)") 
-     $        cgn(istate), mygn
+     $        cgn(if_states(istate)), mygn
             end if
           end do
         end if
 
-c       Select the force to use
-        do istate=1, mndo_nstates
-          if(mndo_states(istate).eq.mndo_currentstate) exit
-        end do
-
-        demndo = demndo_tmp(:,:,istate)
+        demndo = demndo_tmp(:,:,mndo_currentstate)
 
 c       Project LA gradients on QM and MM atoms
-        call mndo_laproj(demndo_la(:,:,istate))
+        call mndo_laproj(demndo_la(:,:,mndo_currentstate))
 
         if(dosck) then
 c         Check if the computed gradients are OK with Newton 3th law

@@ -100,19 +100,11 @@ c       Handle multi-states calculations
             call fatal
           end if
 
-          mndo_nstates = 0
-          do i=1, mndo_maxs
-            if(mndo_states(i) .lt. 1) exit
-            mndo_nstates = mndo_nstates + 1
-
-            do j=i+1, mndo_maxs
-              if(mndo_states(j) .eq. mndo_states(i)) then
-                write(6, *) "All specified state for MNDO multistate ",
-     &          "should be different!"
-                call fatal
-              end if
-            end do
-          end do
+          if(mndo_nstates .lt. 2) then
+            write(6, *) "Number of requested states should be at ",
+     &                  "lest 2."
+            call fatal
+          end if
 
           if(mndo_nstates .lt. 1) then
             write(6, *) "You should specify at least two states for ",
@@ -120,11 +112,7 @@ c       Handle multi-states calculations
             call fatal
           end if
 
-          do i=1, mndo_nstates
-            if(mndo_currentstate .eq. mndo_states(i)) exit
-          end do
-
-          if(i .gt. mndo_nstates) then
+          if(mndo_currentstate .gt. mndo_nstates) then
             write(6, *) "Requested states should be within the ",
      &      "computed ones."
             call fatal
@@ -151,9 +139,12 @@ c       Debug information
           write(6, "('   QM ATOMS: ', I5)") nqmatoms
           write(6, "('   MM ATOMS: ', I5)") n - nqmatoms
           if(mndo_multistate) then
-            write(6, "('   MNDO MULTISTATE: ', 5I5)") mndo_states
+            write(6, "('   MNDO MULTISTATE: ', I5)") mndo_nstates
             write(6, "('   MNDO SELECT. STATE: ', I5)")
      &      mndo_currentstate
+            if(mndo_ms_all) then
+              write(6, "('   MNDO COMPUTE ALL GRDS ')")
+            end if
           end if
 
           if(mndo_dope) 
