@@ -119,7 +119,7 @@ c       Handle multi-states calculations
           end if
 
 c         add missing keywords
-          call mndomskey(1)
+          call mndomskey(max(1, mndo_icross))
 
         else if(mndo_kci .gt. 0) then
           if(mndo_icross .gt. 0) then
