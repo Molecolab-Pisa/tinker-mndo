@@ -13,8 +13,7 @@
         logical :: intfexists, sck_passed
         character(len=1024) :: line
         real*8 :: mygn, law3(3), yy
-        real*8, allocatable :: demndo_la(:,:,:), demndo_tmp(:,:,:), 
-     &                         emndo_tmp(:), cgn(:), ign(:)   
+        real*8, allocatable :: demndo_la(:,:,:), cgn(:), ign(:)   
         integer, allocatable :: if_states(:)
 
         integer trimtext
@@ -31,11 +30,9 @@
           call fatal
         end if
         
-        allocate(emndo_tmp(mndo_nstates))
         allocate(cgn(mndo_nstates))
         allocate(ign(mndo_nstates))
         allocate(if_states(mndo_nstates))
-        allocate(demndo_tmp(3,n,mndo_nstates))
         if(mndo_usela) then
           allocate(demndo_la(3,mndo_nla,mndo_nstates))
         end if
@@ -218,6 +215,7 @@ c         output file
         end if
 
         demndo = demndo_tmp(:,:,mndo_currentstate)
+        emndo = emndo_tmp(mndo_currentstate)
 
 c       Project LA gradients on QM and MM atoms
         call mndo_laproj(demndo_la(:,:,mndo_currentstate))

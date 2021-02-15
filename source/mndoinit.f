@@ -128,6 +128,9 @@ c         add missing keywords
             call fatal
           end if
         end if
+c       Allocate temporary arrays
+        allocate(emndo_tmp(mndo_nstates))
+        allocate(demndo_tmp(3,n,mndo_nstates))
 
 c       Debug information        
         if(mndo_debug) then

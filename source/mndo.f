@@ -29,6 +29,8 @@
       
       integer :: mndo_nwk, mndo_neline
       character(len=128), allocatable :: mndo_keyword(:), mndo_eline(:)
+
+      real*8, allocatable :: demndo_tmp(:,:,:), emndo_tmp(:)
      
       contains
 
