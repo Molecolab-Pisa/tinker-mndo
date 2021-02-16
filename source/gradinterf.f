@@ -76,14 +76,14 @@ c
 
       if( mndo_ms_all ) then
         do j=1, mndo_nstates
-          write(iintf, '(a, 2i10)') "GRADIENT", j
+          write(iintf, '(a, 2i10)') "GRADIENT", j, n
           do i=1, n
             write(iintf, '(3f20.8)') detot(:,i) -
      &      demndo_tmp(:,i,mndo_currentstate) + demndo_tmp(:,i,j)
           end do
         end do
       else
-        write(iintf, '(a, 2i10)') "GRADIENT", mndo_currentstate
+        write(iintf, '(a, 2i10)') "GRADIENT", mndo_currentstate, n
         do i=1, n
           write(iintf, '(3f20.8)') detot(:,i)
         end do
