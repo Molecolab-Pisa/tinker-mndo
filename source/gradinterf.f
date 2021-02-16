@@ -66,17 +66,28 @@ c
       if(mndo_nstates .gt. 0) then
         write(iintf, '(a, i10)') "POTENTIAL", mndo_nstates
         do i=1, mndo_nstates
-          write(iintf, '(f20.8)') emndo_tmp(i)
+          write(iintf, '(f20.8)') etot - emndo_tmp(mndo_currentstate) 
+     &                            + emndo_tmp(i)
         end do
       else
         write(iintf, '(a, i10)') "POTENTIAL", 1
         write(iintf, '(f20.8)') etot
       end if 
 
-      write(iintf, '(a, 2i10)') "GRADIENT", mndo_currentstate
-      do i=1, n
-        write(iintf, '(3f20.8)') detot(:,i)
-      end do
+      if( mndo_ms_all ) then
+        do j=1, mndo_nstates
+          write(iintf, '(a, 2i10)') "GRADIENT", j
+          do i=1, n
+            write(iintf, '(3f20.8)') detot(:,i) -
+     &      demndo_tmp(:,i,mndo_currentstate) + demndo_tmp(:,i,j)
+          end do
+        end do
+      else
+        write(iintf, '(a, 2i10)') "GRADIENT", mndo_currentstate
+        do i=1, n
+          write(iintf, '(3f20.8)') detot(:,i)
+        end do
+      end if
 
       close(unit=iintf)
 c
