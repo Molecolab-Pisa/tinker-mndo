@@ -53,12 +53,7 @@ c           write down coordinates of LAs
             end do
             write(mndo_in_unit, *) ""
           else
-            if(mndo_currentstate .eq. 1) then
-              write(mndo_in_unit, "(2I4)") 1, 2
-            else
-              write(mndo_in_unit, "(2I4)") mndo_currentstate-1,
-     &                                     mndo_currentstate
-            end if
+              write(mndo_in_unit, "(I4)") mndo_currentstate
           end if
         end if
 

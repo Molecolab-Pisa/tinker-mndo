@@ -294,7 +294,7 @@ c       1         2         3         4         5         6
         if(mndo_ms_all) then
           automatic_prm(2) = mndo_nstates
         else
-          automatic_prm(2) = 2
+          automatic_prm(2) = 1
         end if
         automatic_prm(3) = mndo_nstates
         

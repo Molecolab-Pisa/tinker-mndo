@@ -64,7 +64,7 @@ c           MM coordinates
           else if(isec .eq. 5) then
 c           Header of Energy and Norms
             read(line(67:), 10) if_nstate
-            if(.not. mndo_ms_all .and. if_nstate .ne. 2) then
+            if(.not. mndo_ms_all .and. if_nstate .ne. 1) then
               write(6, *) "Error number of computed state is not ",
      &        "consistent with what tinker expects (2)."
               call fatal
