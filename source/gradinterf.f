@@ -56,8 +56,18 @@ c     compute the analytical gradient components
 c
       call gradient (etot,detot)
 c
+c     resect inactive atoms.
+c
+      do i=1, n
+        if(.not. use(i)) then
+          detot(:,i) = 0.0d0
+          demndo_tmp(:,i,:) = 0.0d0
+        end if
+      end do
+c
 c     Output an interface file.
 c
+
       iintf = freeunit()
       intffile = 'interface.dat'
 
