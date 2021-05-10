@@ -30,8 +30,9 @@ c
       use math
       use torpot
       use usage
+      use mndo
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,rcb
       real*8 angle,fgrp
       real*8 xt,yt,zt
@@ -81,7 +82,7 @@ c
 !$OMP PARALLEL default(private) shared(nitors,iitors,use,x,y,z,
 !$OMP& itors1,itors2,itors3,itorunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eit,neit,aeit)
+!$OMP& shared(eit,neit,aeit,isqm)
 !$OMP DO reduction(+:eit,neit,aeit) schedule(guided)
 c
 c     calculate the improper torsional angle energy term
@@ -91,6 +92,15 @@ c
          ib = iitors(2,i)
          ic = iitors(3,i)
          id = iitors(4,i)
+c
+c     skip interaction if more than one of the atoms is qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.gt.1) cycle
 c
 c     decide whether to compute the current interaction
 c

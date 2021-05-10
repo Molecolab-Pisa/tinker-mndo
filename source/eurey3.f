@@ -29,8 +29,9 @@ c
       use urey
       use urypot
       use usage
+      use mndo
       implicit none
-      integer i,ia,ib,ic
+      integer i,ia,ib,ic,nqm
       real*8 e,ideal,force
       real*8 dt,dt2,fgrp
       real*8 xac,yac,zac,rac
@@ -63,7 +64,7 @@ c
 !$OMP PARALLEL default(private) shared(nurey,iury,ul,uk,
 !$OMP& use,x,y,z,cury,qury,ureyunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eub,neub,aeub)
+!$OMP& shared(eub,neub,aeub,isqm)
 !$OMP DO reduction(+:eub,neub,aeub) schedule(guided)
 c
 c     calculate the Urey-Bradley 1-3 energy term
@@ -72,6 +73,15 @@ c
          ia = iury(1,i)
          ib = iury(2,i)
          ic = iury(3,i)
+c
+c        skip if there are more than a qm atom
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (nqm.ge.2) cycle
+c
          ideal = ul(i)
          force = uk(i)
 c

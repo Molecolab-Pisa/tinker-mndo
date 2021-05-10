@@ -53,9 +53,10 @@ c
       use torpot
       use tors
       use usage
+      use mndo
       use virial
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,rcb
       real*8 dedphi,fgrp
       real*8 v1,v2,v3,v4,v5,v6
@@ -107,7 +108,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,use_group,use_polymer)
-!$OMP& shared(et,det,vir)
+!$OMP& shared(et,det,vir,isqm)
 !$OMP DO reduction(+:et,det,vir) schedule(guided)
 c
 c     calculate the torsional angle energy and first derivatives
@@ -117,6 +118,15 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
+c
+c     skip interaction if there are more than two qm atoms
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.ge.3) cycle
 c
 c     decide whether to compute the current interaction
 c
@@ -331,10 +341,11 @@ c
       use torpot
       use tors
       use usage
+      use mndo
       use virial
       use warp
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,rcb,dedphi
       real*8 width,wterm,fgrp
       real*8 v1,v2,v3,v4,v5,v6
@@ -430,6 +441,15 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
+c
+c     skip interaction if there are more than two qm atoms
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.ge.3) cycle
 c
 c     decide whether to compute the current interaction
 c

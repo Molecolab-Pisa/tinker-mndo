@@ -67,6 +67,7 @@ c
       use mutant
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       implicit none
@@ -153,6 +154,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.
@@ -284,6 +286,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.
@@ -419,6 +422,7 @@ c
       use mutant
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       implicit none
@@ -550,6 +554,7 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             prime = (kk .le. nvdw)
@@ -703,6 +708,7 @@ c
       use neigh
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       implicit none
@@ -764,7 +770,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
 !$OMP& vcouple,vlambda,scexp,scalpha,mut,cut2,c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev)
+!$OMP& firstprivate(vscale,iv14) shared(ev,isqm)
 !$OMP DO reduction(+:ev) schedule(guided)
 c
 c     find the van der Waals energy via neighbor list search
@@ -799,6 +805,7 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.

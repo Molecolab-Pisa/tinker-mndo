@@ -26,9 +26,10 @@ c
       use math
       use torpot
       use usage
+      use mndo
       use virial
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,dedphi
       real*8 dt,fgrp
       real*8 ideal,force
@@ -72,7 +73,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
 !$OMP& x,y,z,kprop,vprop,idihunit,use_group,use_polymer)
-!$OMP& shared(eid,deid,vir)
+!$OMP& shared(eid,deid,vir,isqm)
 !$OMP DO reduction(+:eid,deid,vir) schedule(guided)
 c
 c     calculate the improper dihedral angle energy term
@@ -82,6 +83,15 @@ c
          ib = iiprop(2,i)
          ic = iiprop(3,i)
          id = iiprop(4,i)
+c
+c     skip interaction if more than one of the atoms is qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.gt.1) cycle
 c
 c     decide whether to compute the current interaction
 c

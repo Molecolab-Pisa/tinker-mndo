@@ -24,6 +24,7 @@ c
       use group
       use opdist
       use usage
+      use mndo
       implicit none
       integer i,ia,ib,ic,id
       real*8 e,force,fgrp
@@ -48,7 +49,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer)
-!$OMP& shared(eopd)
+!$OMP& shared(eopd,isqm)
 !$OMP DO reduction(+:eopd) schedule(guided)
 c
 c     calculate the out-of-plane distance energy term
@@ -58,6 +59,11 @@ c
          ib = iopd(2,i)
          ic = iopd(3,i)
          id = iopd(4,i)
+c
+c     skip interaction if one of the atoms is qm
+c
+         if (isqm(ia).or.isqm(ib).or.isqm(ic).or.
+     $    isqm(id)) cycle
          force = opdk(i)
 c
 c     decide whether to compute the current interaction

@@ -32,8 +32,9 @@ c
       use iounit
       use math
       use usage
+      use mndo
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,ideal,force
       real*8 fold,factor
       real*8 dot,cosine
@@ -85,7 +86,7 @@ c
 !$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
 !$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(ea,nea,aea)
+!$OMP& shared(ea,nea,aea,isqm)
 !$OMP DO reduction(+:ea,nea,aea) schedule(guided)
 c
 c     calculate the bond angle bending energy term
@@ -95,6 +96,18 @@ c
          ib = iang(2,i)
          ic = iang(3,i)
          id = iang(4,i)
+c
+c        skip interaction if twp or more of the atoms are qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (angtyp(i) .eq. 'IN-PLANE') then
+c          handle out-of-plane bendings
+           if (isqm(id)) nqm = nqm + 1
+         end if
+         if (nqm.gt.1) cycle
          ideal = anat(i)
          force = ak(i)
 c

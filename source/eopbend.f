@@ -27,8 +27,9 @@ c
       use math
       use opbend
       use usage
+      use mndo
       implicit none
-      integer i,iopbend
+      integer i,iopbend,nqm
       integer ia,ib,ic,id
       real*8 e,force,angle
       real*8 sine,fgrp
@@ -57,7 +58,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopbend,iopb,iang,opbk,use,
 !$OMP& x,y,z,opbtyp,copb,qopb,popb,sopb,opbunit,use_group,use_polymer)
-!$OMP& shared(eopb)
+!$OMP& shared(eopb,isqm)
 !$OMP DO reduction(+:eopb) schedule(guided)
 c
 c     calculate the out-of-plane bending energy term
@@ -68,6 +69,15 @@ c
          ib = iang(2,i)
          ic = iang(3,i)
          id = iang(4,i)
+c
+c     skip interaction if mor than one of the atoms is qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.gt.1) cycle
          force = opbk(iopbend)
 c
 c     decide whether to compute the current interaction

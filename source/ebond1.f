@@ -25,9 +25,10 @@ c
       use energi
       use group
       use usage
+      use mndo
       use virial
       implicit none
-      integer i,ia,ib
+      integer i,ia,ib,nqm
       real*8 e,ideal,force
       real*8 expterm,bde,fgrp
       real*8 dt,dt2,deddt
@@ -52,7 +53,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer)
-!$OMP& shared(eb,deb,vir)
+!$OMP& shared(eb,deb,vir,isqm)
 !$OMP DO reduction(+:eb,deb,vir) schedule(guided)
 c
 c     calculate the bond stretch energy and first derivatives
@@ -60,6 +61,16 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
+c
+c     skip interaction if both the atoms are qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (nqm.eq.2) cycle
+c  10 format(A,4I5)
+c     skip interaction if one of the atoms is qm
+c
          ideal = bl(i)
          force = bk(i)
 c

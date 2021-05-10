@@ -96,6 +96,7 @@ c
       use mutant
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       implicit none
@@ -198,6 +199,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.
@@ -362,6 +364,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.
@@ -537,6 +540,7 @@ c
       use mutant
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       implicit none
@@ -685,6 +689,7 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             prime = (kk .le. nvdw)
@@ -885,6 +890,7 @@ c
       use neigh
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       implicit none
@@ -962,7 +968,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
 !$OMP& off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
 !$OMP& vcouple,vlambda,scexp,scalpha,mut,cut2,c0,c1,c2,c3,c4,c5,
-!$OMP& molcule,name,verbose,debug,header,iout)
+!$OMP& molcule,name,verbose,debug,header,iout,isqm)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c

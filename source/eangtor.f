@@ -26,6 +26,7 @@ c
       use torpot
       use tors
       use usage
+      use mndo
       implicit none
       integer i,k,iangtor
       integer ia,ib,ic,id
@@ -64,7 +65,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
 !$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,use_group,use_polymer)
-!$OMP& shared(eat)
+!$OMP& shared(eat,isqm)
 !$OMP DO reduction(+:eat) schedule(guided)
 c
 c     calculate the angle-torsion interaction energy term
@@ -75,6 +76,11 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
+c
+c     skip interaction if one of the atoms is qm
+c
+         if (isqm(ia).or.isqm(ib).or.isqm(ic).or.
+     $    isqm(id)) cycle
 c
 c     decide whether to compute the current interaction
 c

@@ -29,8 +29,9 @@ c
       use inform
       use iounit
       use usage
+      use mndo
       implicit none
-      integer i,ia,ib
+      integer i,ia,ib,nqm
       real*8 e,ideal,force
       real*8 expterm,bde
       real*8 dt,dt2,fgrp
@@ -64,7 +65,7 @@ c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eb,neb,aeb)
+!$OMP& shared(eb,neb,aeb,isqm)
 !$OMP DO reduction(+:eb,neb,aeb) schedule(guided)
 c
 c     calculate the bond stretching energy term
@@ -72,6 +73,13 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
+c
+c     skip interaction if both atoms are qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (nqm.eq.2) cycle
          ideal = bl(i)
          force = bk(i)
 c

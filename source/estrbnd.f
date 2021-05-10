@@ -26,9 +26,10 @@ c
       use math
       use strbnd
       use usage
+      use mndo
       implicit none
       integer i,j,k,istrbnd
-      integer ia,ib,ic
+      integer ia,ib,ic,nqm
       real*8 e,dt
       real*8 dr1,dr2
       real*8 fgrp,angle
@@ -53,7 +54,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
 !$OMP& anat,bl,bk,use,x,y,z,stbnunit,use_group,use_polymer)
-!$OMP& shared(eba)
+!$OMP& shared(eba,isqm)
 !$OMP DO reduction(+:eba) schedule(guided)
 c
 c     calculate the stretch-bend interaction energy term
@@ -63,6 +64,14 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
+c
+c     skip interaction if two or more atoms are qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1 
+         if (isqm(ib)) nqm = nqm + 1 
+         if (isqm(ic)) nqm = nqm + 1 
+         if (nqm.ge.2) cycle
          force1 = sbk(1,istrbnd)
          force2 = sbk(2,istrbnd)
 c

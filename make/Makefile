@@ -1976,6 +1976,7 @@ minima.o:
 minimize.o: atoms.o bound.o files.o freeze.o inform.o iounit.o scales.o usage.o
 minirot.o: files.o inform.o iounit.o math.o omega.o scales.o zcoord.o
 minrigid.o: files.o group.o inform.o iounit.o math.o output.o rigid.o
+mndo.o: deriv.o
 mol2xyz.o: files.o iounit.o titles.o
 molcul.o:
 moldyn.o:

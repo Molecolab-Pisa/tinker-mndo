@@ -30,6 +30,7 @@ c
       use iounit
       use opdist
       use usage
+      use mndo
       implicit none
       integer i,ia,ib,ic,id
       real*8 e,force,fgrp
@@ -71,7 +72,7 @@ c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eopd,neopd,aeopd)
+!$OMP& shared(eopd,neopd,aeopd,isqm)
 !$OMP DO reduction(+:eopd,neopd,aeopd) schedule(guided)
 c
 c     calculate the out-of-plane distance energy term
@@ -81,6 +82,11 @@ c
          ib = iopd(2,i)
          ic = iopd(3,i)
          id = iopd(4,i)
+c
+c     skip interaction if one of the atoms is qm
+c
+         if (isqm(ia).or.isqm(ib).or.isqm(ic).or.
+     $    isqm(id)) cycle
          force = opdk(i)
 c
 c     decide whether to compute the current interaction

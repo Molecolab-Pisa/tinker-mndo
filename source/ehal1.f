@@ -74,6 +74,7 @@ c
       use mutant
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       use virial
@@ -179,6 +180,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            if (isqm(i).and.isqm(k)) cycle
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -380,6 +382,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.
@@ -586,6 +589,7 @@ c
       use mutant
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       use virial
@@ -735,6 +739,7 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             prime = (kk .le. nvdw)
@@ -958,6 +963,7 @@ c
       use neigh
       use shunt
       use usage
+      use mndo
       use vdw
       use vdwpot
       use virial
@@ -1035,7 +1041,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
 !$OMP& off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,cut2,
 !$OMP& vcouple,vlambda,scexp,scalpha,mut,c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev,dev,vir)
+!$OMP& firstprivate(vscale,iv14) shared(ev,dev,vir,isqm)
 !$OMP DO reduction(+:ev,dev,vir) schedule(guided)
 c
 c     find van der Waals energy and derivatives via neighbor list
@@ -1072,6 +1078,7 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
+            if (isqm(i).and.isqm(k)) cycle
             kv = ired(k)
             mutk = mut(k)
             proceed = .true.

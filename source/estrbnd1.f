@@ -28,10 +28,11 @@ c
       use math
       use strbnd
       use usage
+      use mndo
       use virial
       implicit none
       integer i,j,k,istrbnd
-      integer ia,ib,ic
+      integer ia,ib,ic,nqm
       real*8 e,dt
       real*8 dr1,dr2
       real*8 fgrp,angle
@@ -73,7 +74,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
 !$OMP& anat,bl,bk,use,x,y,z,stbnunit,use_group,use_polymer)
-!$OMP& shared(eba,deba,vir)
+!$OMP& shared(eba,deba,vir,isqm)
 !$OMP DO reduction(+:eba,deba,vir) schedule(guided)
 c
 c     calculate the stretch-bend energy and first derivatives
@@ -88,6 +89,12 @@ c
 c
 c     decide whether to compute the current interaction
 c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1 
+         if (isqm(ib)) nqm = nqm + 1 
+         if (isqm(ic)) nqm = nqm + 1 
+         if (nqm.ge.2) cycle
+C
          proceed = .true.
          if (use_group)  call groups (proceed,fgrp,ia,ib,ic,0,0,0)
          if (proceed)  proceed = (use(ia) .or. use(ib) .or. use(ic))

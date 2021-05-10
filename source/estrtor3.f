@@ -32,9 +32,10 @@ c
       use torpot
       use tors
       use usage
+      use mndo
       implicit none
       integer i,k,istrtor
-      integer ia,ib,ic,id
+      integer ia,ib,ic,id,nqm
       real*8 e,dr
       real*8 fgrp,angle
       real*8 rt2,ru2,rtru
@@ -85,7 +86,7 @@ c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(ebt,nebt,aebt)
+!$OMP& shared(ebt,nebt,aebt,isqm)
 !$OMP DO reduction(+:ebt,nebt,aebt) schedule(guided)
 c
 c     calculate the stretch-torsion interaction energy term
@@ -96,6 +97,15 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
+c
+c     skip if there is more than a QM atom
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.ge.2) cycle
 c
 c     decide whether to compute the current interaction
 c

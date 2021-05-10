@@ -25,9 +25,10 @@ c
       use imptor
       use torpot
       use usage
+      use mndo
       use virial
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,dedphi
       real*8 rcb,fgrp
       real*8 xt,yt,zt
@@ -76,7 +77,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nitors,iitors,use,x,y,z,
 !$OMP& itors1,itors2,itors3,itorunit,use_group,use_polymer)
-!$OMP& shared(eit,deit,vir)
+!$OMP& shared(eit,deit,vir,isqm)
 !$OMP DO reduction(+:eit,deit,vir) schedule(guided)
 c
 c     calculate the improper torsional angle energy term
@@ -86,6 +87,15 @@ c
          ib = iitors(2,i)
          ic = iitors(3,i)
          id = iitors(4,i)
+c
+c     skip interaction if more than one of the atoms is qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.gt.1) cycle
 c
 c     decide whether to compute the current interaction
 c

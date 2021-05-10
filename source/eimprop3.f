@@ -30,8 +30,9 @@ c
       use math
       use torpot
       use usage
+      use mndo
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,ia,ib,ic,id,nqm
       real*8 e,dt,fgrp
       real*8 ideal,force
       real*8 cosine,sine
@@ -76,7 +77,7 @@ c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
 !$OMP& x,y,z,kprop,vprop,idihunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eid,neid,aeid)
+!$OMP& shared(eid,neid,aeid,isqm)
 !$OMP DO reduction(+:eid,neid,aeid) schedule(guided)
 c
 c     calculate the improper dihedral angle energy term
@@ -86,6 +87,15 @@ c
          ib = iiprop(2,i)
          ic = iiprop(3,i)
          id = iiprop(4,i)
+c
+c     skip interaction if more than one of the atoms is qm
+c
+         nqm = 0
+         if (isqm(ia)) nqm = nqm + 1
+         if (isqm(ib)) nqm = nqm + 1
+         if (isqm(ic)) nqm = nqm + 1
+         if (isqm(id)) nqm = nqm + 1
+         if (nqm.gt.1) cycle
 c
 c     decide whether to compute the current interaction
 c
