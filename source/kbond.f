@@ -202,7 +202,11 @@ c
          nqm = 0
          if (isqm(ia)) nqm = nqm + 1
          if (isqm(ib)) nqm = nqm + 1
-         if (nqm.eq.2) cycle
+         if (nqm.eq.2) then 
+           bk(i) = 0.0d0
+           bl(i) = 0.0d0
+           cycle
+        end if
 c
          ita = class(ia)
          itb = class(ib)
