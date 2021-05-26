@@ -56,6 +56,8 @@ c         Create a line every 50 char
           write(unitio, "(A)", advance="no") mndo_keyword(i)(:l)
           write(unitio, "(A)", advance="no") " " 
           nchl = nchl + l +  1
+          
+          if( mndo_keyword(i)(:5) .eq. 'imult' ) nchl = 51
         end do
 
         write(unitio, *) ""
