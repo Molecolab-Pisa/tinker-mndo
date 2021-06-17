@@ -3,16 +3,17 @@
         use atoms
         use mndo
         use charge
+        use usage
 
         implicit none
 
-        integer :: i, j, l, elb
+        integer :: i, j, l, elb, iselct
         real*8 :: lapos(3)
 
         integer trimtext
   
   10   format(i2, 8x, 3(F10.5,2x,i2,6x))
-  20   format(3F12.4,F8.4)
+  20   format(3F12.4,F8.4,I3)
 
         open(unit=mndo_in_unit, file=mndo_in)
 
@@ -72,8 +73,13 @@ c         write down link atoms list
         end if
 
         do i=1, n-nqmatoms
+          if( use(mmlist(i)) ) then
+            iselct = 0
+          else
+            iselct = 1
+          end if
           write(mndo_in_unit, 20) x(mmlist(i)), y(mmlist(i)), 
-     $    z(mmlist(i)), pchg(mmlist(i))
+     $    z(mmlist(i)), pchg(mmlist(i)), iselct
         end do
 
         close(mndo_in_unit)

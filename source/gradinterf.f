@@ -56,7 +56,7 @@ c     compute the analytical gradient components
 c
       call gradient (etot,detot)
 c
-c     resect inactive atoms.
+c     reset inactive atoms.
 c
       do i=1, n
         if(.not. use(i)) then

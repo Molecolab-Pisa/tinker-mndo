@@ -114,7 +114,7 @@ c       1         2         3         4         5         6
 c       7         8         9         10        11        12
      &  "igeom "
      &  /)
-        integer :: automatic_prm(nauto) = (/ 1, 2, -1, 2, 0, 3, 1/)
+        integer :: automatic_prm(nauto) = (/ 1, 2, -1, 2, 1, 3, 1/)
 
         character(len=128) :: skip_kwd(nskip) = (/
 c       1         2         3         4         5         6
