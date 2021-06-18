@@ -3,6 +3,7 @@
         use energi
         use deriv
         use mndo
+        use usage
 
         implicit none
 
@@ -165,8 +166,10 @@ c           output file
 c       Project LA gradients on QM and MM atoms
         call mndo_laproj(demndo_la)
 
-        if(dosck .and. doforce) then
-c         Check if the computed gradients are OK with Newton 3th law
+        if(dosck .and. doforce .and. count(use) .eq. n) then
+c         Check if the computed gradients are OK with Newton 3rd law
+c         This check is skipped if the inactive keyord is present as
+c         with mmskip 3rd law is broken
           law3 = 0.0
           do i=1, n
             do j=1, 3
@@ -176,7 +179,7 @@ c         Check if the computed gradients are OK with Newton 3th law
           
           if(norm2(law3) .gt. mndo_l3t) then
             sck_passed = .false.
-            write(6, *) "Computed forces does not respect Newton 3th", 
+            write(6, *) "Computed forces does not respect Newton 3rd", 
      &      " law."
             write(6, '("Ftot(X,Y,Z) = ", 3F12.6)') law3
           end if
