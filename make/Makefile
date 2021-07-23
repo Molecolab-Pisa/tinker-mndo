@@ -415,6 +415,7 @@ OBJS =	action.o \
 	gkstuf.o \
 	gradient.o \
 	gradinterf.o \
+	potinterf.o \
 	gradrgd.o \
 	gradrot.o \
 	group.o \
@@ -760,6 +761,7 @@ EXEFILES = alchemy.x \
 	    dynamic.x \
 	    gda.x \
 		gradinterf.x \
+		potinterf.x \
 	    intedit.x \
 	    intxyz.x \
 	    minimize.x \
@@ -1326,6 +1328,7 @@ libtinker.a: ${OBJS}
 	gkstuf.o \
 	gradient.o \
 	gradinterf.o \
+	potinterf.o \
 	gradrgd.o \
 	gradrot.o \
 	group.o \
