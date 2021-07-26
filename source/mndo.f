@@ -10,7 +10,7 @@
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999, mndo_maxs=5
-      logical, parameter :: mndo_debug = .false.
+      logical, parameter :: mndo_debug = .true.
       
       real*8, parameter :: distqmla = 1.00, mndo_l3t=1.0
 
@@ -18,9 +18,9 @@
       logical :: mndo_iterguess
 
 
-      integer :: nqmatoms, mndo_nla
+      integer :: nqmatoms, mndo_nla, mndo_nconjat
       integer :: qmlist(maxatm), mmlist(maxatm), mndo_laqm(maxatm),
-     &           mndo_lamm(maxatm) 
+     &           mndo_lamm(maxatm), mndo_conjlist(maxatm) 
       logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
 
       integer :: mndo_nstates, mndo_currentstate, 

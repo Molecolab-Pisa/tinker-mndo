@@ -67,6 +67,11 @@ c
       do i=1, n
         qmlist(i) = 0
       end do
+      
+      mndo_nconjat = 0
+      do i=1, n
+        mndo_conjlist(i) = 0
+      end do
 c
 c     get any keywords containing active atom parameters
 c
@@ -96,7 +101,7 @@ c
                nfixed = nfixed + 1
                fixed(nfixed) = max(-n,min(n,fixed(nfixed)))
             end do
-c     
+c         
 c
 c
          else if (keyword(1:8) .eq. 'QMATOMS ') then
@@ -105,6 +110,17 @@ c
             do while (qmlist(nqmatoms+1) .ne. 0)
                nqmatoms = nqmatoms + 1
                if (nqmatoms.eq.n) exit
+            end do
+c     
+c
+c
+         else if (keyword(1:10) .eq. 'CONJATOMS ') then
+            read (string,*,err=26,end=26) (mndo_conjlist(i),
+     &                                     i=mndo_nconjat+1,n)
+   26       continue
+            do while (mndo_conjlist(mndo_nconjat+1) .ne. 0)
+               mndo_nconjat = mndo_nconjat + 1
+               if (mndo_nconjat.eq.n) exit
             end do
 
 c

@@ -1,4 +1,5 @@
       subroutine mndoinit()
+        use atomid
         use atoms
         use mndo
         
@@ -6,7 +7,7 @@
       
         integer :: i, j, imm, l, ios, isec, temp_nat, mndot_nline,
      $  mndot_oline
-        logical :: file_exists
+        logical :: file_exists, isinqm
         character(len=1024), allocatable :: mndo_template(:)
 
         integer trimtext
@@ -90,6 +91,43 @@ c       Read template file and save keyword
 c       Check keyword
         call mndo_parse_key(mndo_template, mndot_oline)
 
+c       Conjugate atoms for automatic handling of movo=-5/nconj > 0
+        if(mndo_nconjat > 0) then
+          if(mndo_kci .ne. 5) then
+            write(6, *) "You can only select atoms in conjugate system",
+     &      "if you are using kci=5."
+            call fatal
+          end if
+
+          if(mndo_nconjat < 3) then
+            write(6, *) "You should select at least 3 atoms in your",
+     &      "conjugated system!"
+            call fatal
+          end if
+
+          do i=1, mndo_nconjat
+            if(atomic(mndo_conjlist(i)) < 3) then
+              write(6, *) "Atom", mndo_conjlist(i), "in conugate",
+     &        "system does not have p orbitals."
+              call fatal
+            end if
+
+            isinqm = .false.
+            do j=1, nqmatoms
+              if(mndo_conjlist(i) .eq. qmlist(j)) then
+                isinqm = .true.
+              end if
+            end do
+
+            if( .not. isinqm ) then
+              write(6, *) "Atom", mndo_conjlist(i), "in conugate",
+     &        "system is not QM."
+              call fatal
+            end if
+
+          end do
+        end if
+
 c       Handle multi-states calculations
         if(mndo_multistate) then
           if(mndo_kci .ne. 5) then
@@ -128,6 +166,7 @@ c         add missing keywords
             call fatal
           end if
         end if
+
 c       Allocate temporary arrays
         allocate(emndo_tmp(mndo_nstates))
         allocate(demndo_tmp(3,n,mndo_nstates))
