@@ -23,7 +23,7 @@ c       Find out if a link atom is needed
             end do
           end do
         end do
-        
+       
         if(mndo_debug .and. mndo_nla .gt. 0) then
           write(6, *) ""
           write(6, *) "Link atom table"
@@ -37,8 +37,4 @@ c       Find out if a link atom is needed
           write(6, *) ""
         end if
 
-        if(mndo_usela) then
-          write(6, *) "Link atom are still not implemented."
-c          call fatal
-        end if
       end  
