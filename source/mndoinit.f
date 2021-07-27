@@ -93,22 +93,26 @@ c       Check keyword
 
 c       Conjugate atoms for automatic handling of movo=-5/nconj > 0
         if(mndo_nconjat > 0) then
+          do i=1, maxatm
+            mndo_qmconjl(i) = 0
+          end do
+
           if(mndo_kci .ne. 5) then
             write(6, *) "You can only select atoms in conjugate system",
-     &      "if you are using kci=5."
+     &      " if you are using kci=5."
             call fatal
           end if
 
           if(mndo_nconjat < 3) then
             write(6, *) "You should select at least 3 atoms in your",
-     &      "conjugated system!"
+     &      " conjugated system!"
             call fatal
           end if
 
           do i=1, mndo_nconjat
             if(atomic(mndo_conjlist(i)) < 3) then
               write(6, *) "Atom", mndo_conjlist(i), "in conugate",
-     &        "system does not have p orbitals."
+     &        " system does not have p orbitals."
               call fatal
             end if
 
@@ -116,11 +120,12 @@ c       Conjugate atoms for automatic handling of movo=-5/nconj > 0
             do j=1, nqmatoms
               if(mndo_conjlist(i) .eq. qmlist(j)) then
                 isinqm = .true.
+                mndo_qmconjl(i) = j
               end if
             end do
 
             if( .not. isinqm ) then
-              write(6, *) "Atom", mndo_conjlist(i), "in conugate",
+              write(6, *) "Atom", mndo_conjlist(i), "in conugate ",
      &        "system is not QM."
               call fatal
             end if
@@ -132,7 +137,7 @@ c       Handle multi-states calculations
         if(mndo_multistate) then
           if(mndo_kci .ne. 5) then
             write(6, *) "Multi-state calculations are only implemented",
-     &      "with GUGA-CI post-HF treatment (kci=5). You should ",
+     &      " with GUGA-CI post-HF treatment (kci=5). You should ",
      &      "specify and configure such a calculation in your template",
      &      " to proceed."
             call fatal
@@ -140,7 +145,7 @@ c       Handle multi-states calculations
 
           if(mndo_nstates .lt. 2) then
             write(6, *) "Number of requested states should be at ",
-     &                  "lest 2."
+     &                  "least 2."
             call fatal
           end if
 

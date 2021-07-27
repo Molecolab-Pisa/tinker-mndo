@@ -20,7 +20,8 @@
 
       integer :: nqmatoms, mndo_nla, mndo_nconjat
       integer :: qmlist(maxatm), mmlist(maxatm), mndo_laqm(maxatm),
-     &           mndo_lamm(maxatm), mndo_conjlist(maxatm) 
+     &           mndo_lamm(maxatm), mndo_conjlist(maxatm), 
+     &           mndo_qmconjl(maxatm)
       logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
 
       integer :: mndo_nstates, mndo_currentstate, 
@@ -107,14 +108,14 @@ c       A smart check should be done
 
         character(len=128) :: key_buffer(1024)
 
-        integer, parameter :: nauto = 7, nskip = 1, nitgu = 3, nla = 2
+        integer, parameter :: nauto = 8, nskip = 1, nitgu = 3, nla = 2
         character(len=128) :: automatic_kwd(nauto) = (/
 c       1         2         3         4         5         6
      &  "iform ", "mminp ", "numatm", "mmcoup", "mmskip", "nsav15",
 c       7         8         9         10        11        12
-     &  "igeom "
+     &  "igeom ", "nconj "
      &  /)
-        integer :: automatic_prm(nauto) = (/ 1, 2, -1, 2, 1, 3, 1/)
+        integer :: automatic_prm(nauto) = (/ 1, 2, -1, 2, 1, 3, 1, 0/)
 
         character(len=128) :: skip_kwd(nskip) = (/
 c       1         2         3         4         5         6
@@ -145,6 +146,10 @@ c       1         2         3         4         5         6
           automatic_prm(4) = 0
         end if
         if(mndo_usela) la_prm(2) = mndo_nla
+        
+        if(mndo_nconjat .gt. 0) then
+          automatic_prm(8) = mndo_nconjat
+        end if
         
         mndo_kci = 0
         mndo_icross = 0

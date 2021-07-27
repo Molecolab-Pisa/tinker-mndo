@@ -63,6 +63,15 @@ c           write down coordinates of LAs
           write(mndo_in_unit, *) mndo_eline(i)(:l)
         end do
 
+        if(mndo_nconjat > 0) then
+c         write down conjugate atoms list format 20i4
+          do i=1, mndo_nconjat
+            if(mod(i,20) .eq. 0) write(mndo_in_unit, *) ""
+            write(mndo_in_unit, "(I4)", advance="no") mndo_qmconjl(i)
+          end do
+          write(mndo_in_unit, *) ""
+        end if
+
         if(mndo_usela) then
 c         write down link atoms list
           do i=1, mndo_nla
