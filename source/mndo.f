@@ -10,7 +10,7 @@
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999, mndo_maxs=5
-      logical, parameter :: mndo_debug = .false.
+      logical, parameter :: mndo_debug = .true.
       
       real*8, parameter :: distqmla = 1.00, mndo_l3t=1.0
 
@@ -391,13 +391,13 @@ c       Now add each automatic keyword
         pos = qmp + distqmla/norm2(dp)*dp
       end
 
-      subroutine mndo_laproj(laforces)
+      subroutine mndo_laproj(laforces, forces)
         use atoms
         use deriv
 
         implicit none
 
-        real*8 :: laforces(3,mndo_nla)
+        real*8 :: laforces(3,mndo_nla), forces(3,n)
 
         integer :: ila, imm, iqm
         real*8 :: np(3), proj(3), mmp(3), qmp(3), g
@@ -420,9 +420,9 @@ c       Now add each automatic keyword
           proj = sum(laforces(:,ila) * np)
           g = distqmla/norm2(mmp - qmp)
 
-          demndo(:,iqm) = demndo(:,iqm) + g*proj*np +
+          forces(:,iqm) = forces(:,iqm) + g*proj*np +
      &                    (1.0-g)*laforces(:,ila)
-          demndo(:,imm) = demndo(:,imm) - g*proj*np + g*laforces(:,ila)
+          forces(:,imm) = forces(:,imm) - g*proj*np + g*laforces(:,ila)
         end do
         
         if(mndo_debug) write(6, *) "Exiting mndo_laproj"

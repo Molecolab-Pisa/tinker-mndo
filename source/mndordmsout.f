@@ -217,11 +217,14 @@ c         output file
           end do
         end if
 
+c       Project LA gradients on QM and MM atoms
+        do i=1, mndo_nstates
+          call mndo_laproj(demndo_la(:,:,i),
+     &                     demndo_tmp(:,:,i))
+        end do
+
         demndo = demndo_tmp(:,:,mndo_currentstate)
         emndo = emndo_tmp(mndo_currentstate)
-
-c       Project LA gradients on QM and MM atoms
-        call mndo_laproj(demndo_la(:,:,mndo_currentstate))
 
         if(dosck .and. count(use) .eq. n) then
 c         Check if the computed gradients are OK with Newton 3rd law
@@ -247,7 +250,11 @@ c         Check if the computed gradients are OK with Newton 3rd law
             call fatal
           end if
         end if
-        
+       
+        if(mndo_ms_all .and. (mndo_icross .eq. 2)) then
+          call mndordnac()
+        end if
+
         if(mndo_debug) write(6, *) "Exiting subroutine mndordmsout"
 
       end
