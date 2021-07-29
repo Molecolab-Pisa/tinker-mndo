@@ -167,8 +167,8 @@ c           output file
           end if
         end if
 
-c       Project LA gradients on QM and MM atoms
-        call mndo_laproj(demndo_la)
+c       Project LA gradients on QM and MM atoms, if force are computed
+        if(doforce) call mndo_laproj(demndo_la)
 
         if(dosck .and. doforce .and. count(use) .eq. n) then
 c         Check if the computed gradients are OK with Newton 3rd law
