@@ -4,26 +4,32 @@
 
         implicit none
 
-        integer :: i, j, isec, ios, if_natqm, if_natmm, xx, isla, ila,
-     &             mndo_nnac
+        integer :: i, j, isec, ios, mndo_nnac, nac_st_a, nac_st_b, nc,
+     &            ila, isla, xx, if_natqm, if_natmm
+
+        logical :: intfexists, dosck, sck_passed
         
         character(len=1024) :: line
         character(len=1024), parameter :: 
      & QM_NAD_H = 'CARTESIAN INTERSTATE COUPLING GRADIENT FOR STATES ', 
      & MM_NAD_H = 
-     & 'CARTESIAN INTERSTATE COUPLING GRADIENT OF MM ATOMS FOR STATES '
+     & 'CARTESIAN INTERSTATE COUPLING GRADIENT OF MM ATOMS FOR STATES ',
+     & N_NAD_H = 'CARTESIAN AND INTERNAL INTERSTATE COUPLING NORMS'
         
-        real*8 :: law3(3), yy
-        real*8, allocatable :: nac(:,:,:), nac_la(:,:,:)
+        real*8 :: law3(3), yy, tmp_cart, tmp_int, mygn
+        real*8, allocatable :: nac(:,:,:), nac_la(:,:,:), nac_norm(:)
 
         integer trimtext
 
   10    format(I5)
   30    format(I5,5x,3F20.10)
   40    format(2I5,3F20.10,I5)
+  50    format(2I5,20X,2F20.10) 
         
         if(mndo_debug) write(6, *) "Entering subroutine mndordnac"
-
+        
+        dosck = .true.
+        
         inquire(file=mndo_intfi, exist=intfexists)
         if (.not. intfexists) then
           write(6, *) "MNDO interface file was not found."
@@ -34,9 +40,10 @@
         
         mndo_nnac = mndo_nstates * (mndo_nstates-1) / 2
        
-        allocate(nac(3,n,mndo_nnac)
+        allocate(nac(3,n,mndo_nnac))
+        allocate(nac_norm(mndo_nnac))
         if(mndo_usela) then
-          allocate(demndo_la(3,mndo_nla,mndo_nstates))
+          allocate(nac_la(3,mndo_nla,mndo_nstates))
         end if
 
         open(unit=mndo_out_unit, file=mndo_intfi)
@@ -45,35 +52,45 @@
         do 
           read(mndo_out_unit, '(A)', iostat=ios) line
           if (ios .ne. 0) exit
+          
+          if (isec .eq. 0 .and. 
+     &        line(2:trimtext(QM_NAD_H)+2) .eq. QM_NAD_H) then
+            read(line(trimtext(QM_NAD_H)+2:), *) nac_st_a, nac_st_b
+            nc = (nac_st_a - 2)*(nac_st_a - 1) / 2 + nac_st_b 
+            isec = 1
+            j = 1
+            ila = 1
+          else if(isec .eq. 0 .and.
+     &            line(2:trimtext(MM_NAD_H)+2) .eq. MM_NAD_H) then
+            read(line(trimtext(MM_NAD_H)+2:), *) nac_st_a, nac_st_b
+            nc = (nac_st_a - 2)*(nac_st_a - 1) / 2 + nac_st_b 
+            isec = 2
+            j = 1
+          else if(isec .eq. 0 .and.
+     &            line(2:trimtext(N_NAD_H)+2) .eq. N_NAD_H) then 
+            isec = 3
 
-          else if(isec .eq. 8) then
-c         QM gradients values
+          else if(isec .eq. 1) then
+c         QM NAC values
             if(trimtext(line) .eq. 0) then
-              if(n-nqmatoms .eq. 0) then
-c               Case full QM
-                if(istate .eq. if_nstate) then
-                  isec = 11
-                else
-                  isec = 7
-                end if
-              else
-                isec = 9
-              end if
+c             End of QM atoms
+              if_natqm = j - 1
+              isec = 0
             else
               if(j .le. nqmatoms) then
                 read(line, 40) xx, xx, 
-     $          demndo_tmp(1, qmlist(j),if_istate), 
-     $          demndo_tmp(2, qmlist(j),if_istate), 
-     $          demndo_tmp(3, qmlist(j),if_istate), isla
+     $          nac(1, qmlist(j), nc), 
+     $          nac(2, qmlist(j), nc), 
+     $          nac(3, qmlist(j), nc), isla
                 if(isla .ne. 0) then
                   write(6, *) "Reading a QM atom gradient as a",
      &            " link atom's one. This is a bug."
                   call fatal
                 end if
               else if(j .le. nqmatoms + mndo_nla .and. mndo_usela) then
-                read(line, 40) xx, xx, demndo_la(1,ila,if_istate), 
-     $          demndo_la(2,ila,if_istate), 
-     $          demndo_la(3,ila,if_istate),isla
+                read(line, 40) xx, xx, nac_la(1,ila,nc), 
+     $          nac_la(2,ila,nc), 
+     $          nac_la(3,ila,nc),isla
                 ila = ila + 1
                 if(isla .ne. 1) then
                   write(6, *) "Reading a link atom gradient as a",
@@ -87,28 +104,26 @@ c               Case full QM
               end if
               j = j + 1
             end if
-          else if(isec .eq. 9) then
-c           MM gradients header
-            isec = 10
-            read(line(42:), *) if_istate 
-            if(if_states(istate) .ne. if_istate) then
-              write(6, *) "Error while reading MM gradient section.",
-     $        "Expected gradient for a different state."
-              call fatal
-            end if
-            j = 1
-          else if(isec .eq. 10) then
+          else if(isec .eq. 2) then
             if(trimtext(line) .eq. 0) then
-              if(istate.eq.if_nstate) then
-                isec = 11
-              else
-                isec = 7
-              end if
+c           end of MM atoms
+              if_natmm = j - 1
+              isec = 0
             else
-              read(line, 40) xx, xx, demndo_tmp(1, mmlist(j),if_istate), 
-     $        demndo_tmp(2, mmlist(j),if_istate), 
-     $        demndo_tmp(3, mmlist(j),if_istate), xx 
+              read(line, 40) xx, xx, nac(1, mmlist(j),nc), 
+     $        nac(2, mmlist(j),nc), 
+     $        nac(3, mmlist(j),nc), xx 
               j = j + 1
+            end if
+          else if(isec .eq. 3) then
+c         NAC norms values
+            if(trimtext(line) .eq. 0) then
+c             End of QM atoms
+              isec = 0
+            else
+              read(line, 50) nac_st_a, nac_st_b, tmp_cart, tmp_int
+              nc = (nac_st_a - 2)*(nac_st_a - 1) / 2 + nac_st_b 
+              nac_norm(nc) = tmp_cart
             end if
           else
             continue
@@ -133,65 +148,40 @@ c         Check if you found the correct number of atoms
 
 c         Check if the norm of QM atoms' gradiend is equal to the one in
 c         output file
-          do istate=1, if_nstate
+          do nc=1, mndo_nnac
             mygn = 0.0
             do i=1, nqmatoms 
               do j=1, 3
-              mygn = mygn + demndo_tmp(j,qmlist(i),if_states(istate))**2
+              mygn = mygn + nac(j, qmlist(i), nc)**2
               end do
             end do
 
             if(mndo_usela) then
               do i=1, mndo_nla
                 do j=1, 3
-                mygn = mygn + demndo_la(j, i,if_states(istate))**2
+                mygn = mygn + nac_la(j, i, nc)**2
                 end do
               end do
             end if
             mygn = sqrt(mygn)
             
-            if(abs(mygn - cgn(if_states(istate))) .gt. 1.0e-7) then
+            if(abs(mygn - nac_norm(nc)) .gt. 1.0e-7) then
               sck_passed = .false.
               write(6, *)"Difference between compute and expected norm",
-     $        " of QM atoms' gradient > 1.0e-7; State = ",
-     $        if_states(istate)
+     $        " of QM atoms' NAC > 1.0e-7; NC = ",
+     $        nc
               write(6, "('Found= ', F12.6, '  Computed= ', F12.6)") 
-     $        cgn(if_states(istate)), mygn
+     $        nac_norm(nc), mygn
             end if
           end do
         end if
 
-        demndo = demndo_tmp(:,:,mndo_currentstate)
-        emndo = emndo_tmp(mndo_currentstate)
-
 c       Project LA gradients on QM and MM atoms
-        call mndo_laproj(demndo_la(:,:,mndo_currentstate))
+        do i=1, mndo_nnac
+          call mndo_laproj(nac_la(:,:,i),
+     &                     nac(:,:,i))
+        end do
 
-        if(dosck .and. count(use) .eq. n) then
-c         Check if the computed gradients are OK with Newton 3rd law
-          law3 = 0.0
-          do i=1, n
-            do j=1, 3
-              law3(j) = law3(j) + demndo(j, i)
-            end do
-          end do
-          
-          if(norm2(law3) .gt. mndo_l3t) then
-            sck_passed = .false.
-            write(6, *) "Computed forces does not respect Newton 3rd", 
-     &      " law."
-            write(6, '("Ftot(X,Y,Z) = ", 3F12.6)') law3
-          end if
-        end if
-        
-        if(dosck) then
-          if(.not. sck_passed) then
-            write(6, *) "MNDO sanity check not passed!"
-            write(6, *) "This is probably due to wrong input or bugs."
-            call fatal
-          end if
-        end if
-        
-        if(mndo_debug) write(6, *) "Exiting subroutine mndordmsout"
+        if(mndo_debug) write(6, *) "Exiting subroutine mndordnac"
 
       end
