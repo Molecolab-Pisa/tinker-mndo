@@ -15,6 +15,8 @@
   10   format(i2, 8x, 3(F10.5,2x,i2,6x))
   20   format(3F12.4,F8.4,I3)
 
+        if(mndo_debug) write(6, *) "Entering subroutine mndomkin"
+
         open(unit=mndo_in_unit, file=mndo_in)
 
 c       Write input options
@@ -92,4 +94,6 @@ c         write down link atoms list
         end do
 
         close(mndo_in_unit)
+
+        if(mndo_debug) write(6, *) "Exiting subroutine mndomkin"
       end

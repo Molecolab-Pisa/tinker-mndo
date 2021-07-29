@@ -22,6 +22,8 @@
   10    format(I5)
   30    format(10x,3F20.10)
   40    format(2I5,3F20.10,I5)
+        
+        if(mndo_debug) write(6, *) "Entering subroutine mndordout"
 
         inquire(file=mndo_intfi, exist=intfexists)
         if (.not. intfexists) then
@@ -119,6 +121,8 @@ c         QM gradients values
         end do
         close(unit=mndo_out_unit)
 
+        if(mndo_debug) write(6, *) "MNDO fort.15 file correctly read."
+
 c     Insert some sanity check here
         if(dosck) then
           sck_passed = .true.
@@ -192,5 +196,7 @@ c         with mmskip 3rd law is broken
             call fatal
           end if
         end if
+        
+        if(mndo_debug) write(6, *) "Exiting subroutine mndordout"
 
       end

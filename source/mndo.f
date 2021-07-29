@@ -402,6 +402,8 @@ c       Now add each automatic keyword
         integer :: ila, imm, iqm
         real*8 :: np(3), proj(3), mmp(3), qmp(3), g
 
+        if(mndo_debug) write(6, *) "Entering mndo_laproj"
+
         do ila=1, mndo_nla
           imm = mndo_lamm(ila)
           iqm = mndo_laqm(ila)
@@ -422,6 +424,8 @@ c       Now add each automatic keyword
      &                    (1.0-g)*laforces(:,ila)
           demndo(:,imm) = demndo(:,imm) - g*proj*np + g*laforces(:,ila)
         end do
+        
+        if(mndo_debug) write(6, *) "Exiting mndo_laproj"
       end
 
       end module mndo

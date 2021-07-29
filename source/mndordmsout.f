@@ -22,6 +22,8 @@
   10    format(I5)
   30    format(I5,5x,3F20.10)
   40    format(2I5,3F20.10,I5)
+        
+        if(mndo_debug) write(6, *) "Entering subroutine mndordmsout"
 
         inquire(file=mndo_intfi, exist=intfexists)
         if (.not. intfexists) then
@@ -245,5 +247,7 @@ c         Check if the computed gradients are OK with Newton 3rd law
             call fatal
           end if
         end if
+        
+        if(mndo_debug) write(6, *) "Exiting subroutine mndordmsout"
 
       end
