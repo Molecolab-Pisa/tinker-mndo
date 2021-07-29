@@ -49,17 +49,6 @@ c           write down coordinates of LAs
 
         write(mndo_in_unit, *) ""
      
-        if(mndo_multistate) then
-          if(mndo_ms_all) then
-            do i=1, mndo_nstates
-              write(mndo_in_unit, "(I4)", advance="no") i
-            end do
-            write(mndo_in_unit, *) ""
-          else
-              write(mndo_in_unit, "(I4)") mndo_currentstate
-          end if
-        end if
-
         do i=1, mndo_neline
           l = trimtext(mndo_eline(i))
           write(mndo_in_unit, *) mndo_eline(i)(:l)
@@ -72,6 +61,17 @@ c         write down conjugate atoms list format 20i4
             write(mndo_in_unit, "(I4)", advance="no") mndo_qmconjl(i)
           end do
           write(mndo_in_unit, *) ""
+        end if
+        
+        if(mndo_multistate) then
+          if(mndo_ms_all) then
+            do i=1, mndo_nstates
+              write(mndo_in_unit, "(I4)", advance="no") i
+            end do
+            write(mndo_in_unit, *) ""
+          else
+              write(mndo_in_unit, "(I4)") mndo_currentstate
+          end if
         end if
 
         if(mndo_usela) then
