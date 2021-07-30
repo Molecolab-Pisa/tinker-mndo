@@ -218,10 +218,12 @@ c         output file
         end if
 
 c       Project LA gradients on QM and MM atoms
-        do i=1, mndo_nstates
-          call mndo_laproj(demndo_la(:,:,i),
-     &                     demndo_tmp(:,:,i))
-        end do
+        if(mndo_usela) then
+          do i=1, mndo_nstates
+            call mndo_laproj(demndo_la(:,:,i),
+     &                       demndo_tmp(:,:,i))
+          end do
+        end if 
 
         demndo = demndo_tmp(:,:,mndo_currentstate)
         emndo = emndo_tmp(mndo_currentstate)
