@@ -5,11 +5,11 @@
         implicit none
 
         integer :: i, j, isec, ios, mndo_nnac, nac_st_a, nac_st_b, nc,
-     &            ila, isla, xx, if_natqm, if_natmm
+     &            ila, isla, xx, if_natqm, if_natmm, iintf
 
         logical :: intfexists, dosck, sck_passed
         
-        character(len=1024) :: line
+        character(len=1024) :: line, nac_intffile
         character(len=1024), parameter :: 
      & QM_NAD_H = 'CARTESIAN INTERSTATE COUPLING GRADIENT FOR STATES ', 
      & MM_NAD_H = 
@@ -19,13 +19,13 @@
         real*8 :: law3(3), yy, tmp_cart, tmp_int, mygn
         real*8, allocatable :: nac(:,:,:), nac_la(:,:,:), nac_norm(:)
 
-        integer trimtext
+        integer trimtext, freeunit
 
-  10    format(I5)
-  30    format(I5,5x,3F20.10)
   40    format(2I5,3F20.10,I5)
   50    format(2I5,20X,2F20.10) 
-        
+  60    format("CARTESIAN INTERSTATE COUPLING GRADIENT FOR STATES",2I5)
+  70    format(I5, 3F20.10)
+
         if(mndo_debug) write(6, *) "Entering subroutine mndordnac"
         
         dosck = .true.
@@ -177,10 +177,32 @@ c         output file
         end if
 
 c       Project LA gradients on QM and MM atoms
-        do i=1, mndo_nnac
-          call mndo_laproj(nac_la(:,:,i),
-     &                     nac(:,:,i))
+        if(mndo_usela) then
+          do i=1, mndo_nnac
+            call mndo_laproj(nac_la(:,:,i),
+     &                       nac(:,:,i))
+          end do
+        end if
+
+c       Write down the nac in the xyz order and with LA projected out!
+        nac_intffile = 'interface_nac.dat'
+        iintf = freeunit()
+
+        open(unit=iintf, file=nac_intffile)
+        
+        do nac_st_b=1, mndo_nstates-1
+          do nac_st_a=nac_st_b+1, mndo_nstates
+            nc = (nac_st_a - 2)*(nac_st_a - 1) / 2 + nac_st_b
+c           write header
+            write(iintf, 60) nac_st_a, nac_st_b
+            do i=1, n
+              write(iintf, 70) i, nac(:,i,nc)
+            end do
+            write(iintf, *) ''
+          end do
         end do
+
+        close(unit=iintf)
 
         if(mndo_debug) write(6, *) "Exiting subroutine mndordnac"
 
