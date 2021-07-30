@@ -253,10 +253,6 @@ c         Check if the computed gradients are OK with Newton 3rd law
           end if
         end if
        
-        if(mndo_ms_all .and. (mndo_icross .eq. 2)) then
-          call mndordnac()
-        end if
-
         if(mndo_debug) write(6, *) "Exiting subroutine mndordmsout"
 
       end

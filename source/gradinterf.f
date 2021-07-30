@@ -100,6 +100,10 @@ c
       end if
 
       close(unit=iintf)
+      
+      if(mndo_ms_all .and. (mndo_icross .eq. 2)) then
+        call mndordnac()
+      end if
 c
 c     perform deallocation of some local arrays
 c
