@@ -43,9 +43,10 @@
         allocate(nac(3,n,mndo_nnac))
         allocate(nac_norm(mndo_nnac))
         if(mndo_usela) then
-          allocate(nac_la(3,mndo_nla,mndo_nstates))
+          allocate(nac_la(3,mndo_nla,mndo_nnac))
         end if
 
+c        if(mndo_debug) write(*, *) "Reading fort.15"
         open(unit=mndo_out_unit, file=mndo_intfi)
        
         isec = 0
@@ -57,6 +58,8 @@
      &        line(2:trimtext(QM_NAD_H)+2) .eq. QM_NAD_H) then
             read(line(trimtext(QM_NAD_H)+2:), *) nac_st_a, nac_st_b
             nc = (nac_st_a - 2)*(nac_st_a - 1) / 2 + nac_st_b 
+c            if(mndo_debug) write(*, *) "Reading QM", nac_st_a, nac_st_b,
+c     &        nc
             isec = 1
             j = 1
             ila = 1
@@ -64,6 +67,8 @@
      &            line(2:trimtext(MM_NAD_H)+2) .eq. MM_NAD_H) then
             read(line(trimtext(MM_NAD_H)+2:), *) nac_st_a, nac_st_b
             nc = (nac_st_a - 2)*(nac_st_a - 1) / 2 + nac_st_b 
+c            if(mndo_debug) write(*, *) "Reading MM", nac_st_a, nac_st_b,
+c     &        nc
             isec = 2
             j = 1
           else if(isec .eq. 0 .and.
@@ -74,6 +79,7 @@
 c         QM NAC values
             if(trimtext(line) .eq. 0) then
 c             End of QM atoms
+c              if(mndo_debug) write(*, *) "Done"
               if_natqm = j - 1
               isec = 0
             else
@@ -107,6 +113,7 @@ c             End of QM atoms
           else if(isec .eq. 2) then
             if(trimtext(line) .eq. 0) then
 c           end of MM atoms
+c              if(mndo_debug) write(*, *) "Done"
               if_natmm = j - 1
               isec = 0
             else
@@ -203,6 +210,9 @@ c           write header
         end do
 
         close(unit=iintf)
+        
+        deallocate(nac)
+        deallocate(nac_la)
 
         if(mndo_debug) write(6, *) "Exiting subroutine mndordnac"
 

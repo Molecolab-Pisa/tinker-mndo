@@ -10,7 +10,7 @@
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999, mndo_maxs=5
-      logical, parameter :: mndo_debug = .true.
+      logical, parameter :: mndo_debug = .false.
       
       real*8, parameter :: distqmla = 1.00, mndo_l3t=1.0
 
