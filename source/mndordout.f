@@ -33,7 +33,7 @@
           call fatal
         end if
 
-        if(mndo_usela) then
+        if(doforce .and. mndo_usela) then
           allocate(demndo_la(3,mndo_nla))
         end if
 
@@ -170,6 +170,7 @@ c           output file
 c       Project LA gradients on QM and MM atoms, if force are computed
         if(doforce .and. mndo_usela) then
           call mndo_laproj(demndo_la, demndo)
+          deallocate(demndo_la)
         end if
 
         if(dosck .and. doforce .and. count(use) .eq. n) then

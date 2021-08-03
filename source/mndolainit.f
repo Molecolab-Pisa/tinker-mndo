@@ -23,6 +23,17 @@ c       Find out if a link atom is needed
             end do
           end do
         end do
+
+c      Find out which atoms should have charge removed
+       mndo_delchg(:) = .false.
+       do i=1, mndo_nla
+        mndo_delchg(mndo_lamm(i)) = .true.
+        if(mndo_la13) then
+          do j=1, n12(mndo_lamm(i))
+            mndo_delchg(i12(j,mndo_lamm(i))) = .true.
+          end do
+        end if
+       end do
        
         if(mndo_debug .and. mndo_nla .gt. 0) then
           write(6, *) ""
@@ -35,6 +46,10 @@ c       Find out if a link atom is needed
           end do
           write(6, *) "---------------"
           write(6, *) ""
+          write(6, *) "Charge will be removed on the following centers:"
+          do i=1, n
+            if(mndo_delchg(i)) write(6, "('ATOM : ', I5)") i
+          end do
         end if
 
       end  

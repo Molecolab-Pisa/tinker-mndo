@@ -223,6 +223,7 @@ c       Project LA gradients on QM and MM atoms
             call mndo_laproj(demndo_la(:,:,i),
      &                       demndo_tmp(:,:,i))
           end do
+          deallocate(demndo_la)
         end if 
 
         demndo = demndo_tmp(:,:,mndo_currentstate)

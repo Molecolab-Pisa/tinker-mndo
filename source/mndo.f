@@ -10,9 +10,9 @@
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999, mndo_maxs=5
-      logical, parameter :: mndo_debug = .false.
+      logical, parameter :: mndo_debug = .false., mndo_la13 = .true.
       
-      real*8, parameter :: distqmla = 1.00, mndo_l3t=1.0
+      real*8, parameter :: distqmla = 1.10, mndo_l3t=1.0e-5
 
       character(len=1024) :: mndo_exe, template_fname, mndo_postexe
       logical :: mndo_iterguess
@@ -22,7 +22,8 @@
       integer :: qmlist(maxatm), mmlist(maxatm), mndo_laqm(maxatm),
      &           mndo_lamm(maxatm), mndo_conjlist(maxatm), 
      &           mndo_qmconjl(maxatm)
-      logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela
+      logical :: isqm(maxatm), ismndoinit, mndo_dope, mndo_usela, 
+     &           mndo_delchg(maxatm) 
 
       integer :: mndo_nstates, mndo_currentstate, 
      &           mndo_kci, mndo_icross
@@ -132,7 +133,7 @@ c       1         2         3         4         5         6
 c       1         2         3         4         5         6
      &  "mmlink", "nlink "
      &  /)
-        integer :: la_prm(nla) = (/ 1, -1 /)
+        integer :: la_prm(nla) = (/ 2, -1 /)
         
         integer :: i, j, k, l, prm
         character(len=128) :: rch, kw
@@ -374,7 +375,7 @@ c       Now add each automatic keyword
         real*8 :: pos(3)
 
         integer :: imm, iqm 
-        real*8 :: dp(3), mmp(3), qmp(3)
+        real*8 :: mmp(3), qmp(3)
 
         imm = mndo_lamm(ila)
         iqm = mndo_laqm(ila)
@@ -387,20 +388,109 @@ c       Now add each automatic keyword
         mmp(2) = y(imm)
         mmp(3) = z(imm)
         
+        call mndo_lapos_def(mmp, qmp, pos)
+      end
+      
+      subroutine mndo_lapos_def(mmp, qmp, pos)
+        implicit none
+        real*8 :: pos(3), mmp(3), qmp(3), dp(3)
+        
         dp = mmp - qmp
         pos = qmp + distqmla/norm2(dp)*dp
       end
+      
+      subroutine mndo_laproj_tensor(qmp, mmp, tensor, qm)
+        implicit none
 
-      subroutine mndo_laproj(laforces, forces)
+        real*8 :: qmp(3), mmp(3), tensor(3,3), delta, p0(3), p1(3)
+        integer :: i, j
+        logical :: qm
+
+        delta = 1e-3
+
+        do i=1, 3
+          if(qm) then
+            qmp(i) = qmp(i) + delta
+          else
+            mmp(i) = mmp(i) + delta
+          end if
+
+          call mndo_lapos_def(mmp, qmp, p0)
+
+          if(qm) then
+            qmp(i) = qmp(i) - 2*delta
+          else
+            mmp(i) = mmp(i) - 2*delta
+          end if
+
+          call mndo_lapos_def(mmp, qmp, p1)
+
+          tensor(:,i) = (p0 - p1)/(2*delta)
+          
+          if(qm) then
+            qmp(i) = qmp(i) + delta
+          else
+            mmp(i) = mmp(i) + delta
+          end if
+        end do
+      end 
+      
+      subroutine mndo_laproj_numerical(laforces, forces)
         use atoms
-        use deriv
 
         implicit none
 
         real*8 :: laforces(3,mndo_nla), forces(3,n)
 
-        integer :: ila, imm, iqm
-        real*8 :: np(3), proj(3), mmp(3), qmp(3), g
+        integer :: ila, imm, iqm, i, j
+        real*8 :: mmp(3), qmp(3), tensor(3,3)
+
+        if(mndo_debug) write(6, *) "Entering mndo_laproj_numerical"
+
+        do ila=1, mndo_nla
+          imm = mndo_lamm(ila)
+          iqm = mndo_laqm(ila)
+
+          qmp(1) = x(iqm)
+          qmp(2) = y(iqm)
+          qmp(3) = z(iqm)
+
+          mmp(1) = x(imm)
+          mmp(2) = y(imm)
+          mmp(3) = z(imm)
+          
+          call mndo_laproj_tensor(qmp, mmp, tensor, .true.)
+          
+          do i=1, 3
+            do j=1, 3
+              forces(i,iqm) = forces(i,iqm) +
+     &                        laforces(j,ila)*tensor(j,i)
+            end do
+          end do
+          
+          call mndo_laproj_tensor(qmp, mmp, tensor, .false.)
+          
+          do i=1, 3
+            do j=1, 3
+              forces(i,imm) = forces(i,imm) +
+     &                        laforces(j,ila)*tensor(j,i)
+            end do
+          end do
+
+        end do
+        
+        if(mndo_debug) write(6, *) "Exiting mndo_laproj_numerical"
+      end
+
+      subroutine mndo_laproj(laforces, forces)
+        use atoms
+
+        implicit none
+
+        real*8 :: laforces(3,mndo_nla), forces(3,n)
+
+        integer :: ila, imm, iqm, i, j
+        real*8 :: mmp(3), qmp(3), g, np(3), proj
 
         if(mndo_debug) write(6, *) "Entering mndo_laproj"
 
@@ -415,7 +505,7 @@ c       Now add each automatic keyword
           mmp(1) = x(imm)
           mmp(2) = y(imm)
           mmp(3) = z(imm)
-
+          
           np = (mmp - qmp) / norm2(mmp - qmp)
           proj = sum(laforces(:,ila) * np)
           g = distqmla/norm2(mmp - qmp)
