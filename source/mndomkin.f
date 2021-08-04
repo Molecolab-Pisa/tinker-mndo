@@ -8,7 +8,6 @@
         implicit none
 
         integer :: i, j, l, elb, iselct
-        logical :: delchg
         real*8 :: lapos(3)
 
         integer trimtext
@@ -91,14 +90,7 @@ c         write down link atoms list
             iselct = 1
           end if
           
-          delchg = .false.
-          if( mndo_usela ) then
-            do j=1, mndo_nla
-              if(mndo_lamm(j) .eq. mmlist(i)) delchg = .true.
-            end do
-          end if
-          
-          if(delchg) then
+          if(mndo_delchg(mmlist(i))) then
 c           This charge is just here as place holder!
             if(mndo_debug) write(*, *) "Charge on atom ", mmlist(i), 
      $         " not included in MNDO."
