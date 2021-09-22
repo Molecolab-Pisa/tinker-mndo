@@ -42,3 +42,6 @@ This is a listo of the keywords added or modified in the MNDO-Tinker interface.
 <B>qmatoms</B>: specify which are the atoms in the QM part of the system. LA are automatically generated where needed. Indexes are provided following the xyz numbering.
 
 <B>conjatoms</B>: for calculation with pipop keyword in mndo template, specify the atoms in the conjugate system. Indexes are provided following xyz numbering.
+
+<H3><B>Link atom policies</B></H3>
+Link atom is placed on the QM-MM bond at a distance of 1.1 A (controlled from variable distqmla in mndo.f at compile time) from the QM atom. Charges on MM atoms at 1 and 2 bonded of distance from the QM atoms are turned off in the QM/MM calculation (charges on atoms at two bonds from the QM part can be preserved setting mndo\_la13 to .false. in mndo.f at compile time). All the electrostatic integrals are included in the QM/MM coupling scheme in MNDO (mmlink=2).

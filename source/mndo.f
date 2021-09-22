@@ -10,7 +10,7 @@
      & mndo_default_template = 'template.inp' 
       integer, parameter :: mndo_in_unit = 998, mndo_out_unit = 997,
      & temp_unit=999, mndo_maxs=5
-      logical, parameter :: mndo_debug = .true., mndo_la13 = .true.
+      logical, parameter :: mndo_debug = .false., mndo_la13 = .true.
       
       real*8, parameter :: distqmla = 1.10, mndo_l3t=1.0e-3
 
@@ -396,8 +396,7 @@ c       Now add each automatic keyword
         real*8 :: pos(3), mmp(3), qmp(3), dp(3)
         
         dp = mmp - qmp
-        pos = qmp + 0.75*dp
-c        pos = qmp + distqmla/norm2(dp)*dp
+        pos = qmp + distqmla/norm2(dp)*dp
       end
       
       subroutine mndo_laproj_tensor(qmp, mmp, tensor, qm)
@@ -436,7 +435,7 @@ c        pos = qmp + distqmla/norm2(dp)*dp
         end do
       end 
       
-      subroutine mndo_laproj(laforces, forces)
+      subroutine num_mndo_laproj(laforces, forces)
         use atoms
 
         implicit none
@@ -483,7 +482,7 @@ c        pos = qmp + distqmla/norm2(dp)*dp
         if(mndo_debug) write(6, *) "Exiting mndo_laproj_numerical"
       end
 
-      subroutine x_mndo_laproj(laforces, forces)
+      subroutine mndo_laproj(laforces, forces)
         use atoms
 
         implicit none
