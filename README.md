@@ -19,14 +19,26 @@ Tinker requires two object libraries from the FFTW Fourier transform package, li
 If you do not want to build Tinker youself, pre-built Tinker executables for Linux, MacOS, and Windows are available for download from https://dasher.wustl.edu/tinker/. They should run on most recent vintage machines using these operating systems, and can handle a maximum of 1 million atoms provided sufficient memory is available. The Linux executables require at least glibc-2.6 or later. Note starting with Tinker 8, we no longer provide pre-built executables for any 32-bit operating systems.
 
 <H2><B>MNDO related keywords</B></H2>
-`mndomm`: enable QM(MNDO)/MM calculation
-`mndoexe`: specify the MNDO2020 command in the shell environment (default mndo2020)
-`mndonoiterguess`: disable MNDO guess based on previous calculation (default is to do it). This option disable automatic keyword ipubo=1,ktrial=11,imomap=3.
-`mndotemplate`: specify the MNDO template to create the MNDO input during a QM/MM calculation (default is template.inp). Note that according to the option provided, Tinker read the option of template file, modify them where needed and than reassemble the output from scratch.
-`mndopostexe`: if specified, the script/excutable is run after the excution of MNDO. It can be used to archive files, extract information from MNDO logs etc.
-`mndoallgrd`: ask mndo to compute gradients for all the electronic states included in the calculation (default is to only compute gradients on current state). This is only allowed with kci=5.
-`mndostates`: number of electronic states to be computed in MNDO calculation (default is to only compute ground state).
-`mndocurrentstate`: state to be used for the dynamic propagation (default is ground state).
-`inactive`: same behavior of standard Tinker but if an MM atom is set inactive, its gradients are not computed in QM/MM calculation, actually reducing the overall cost.
-`qmatoms`: specify which are the atoms in the QM part of the system. LA are automatically generated where needed. Indexes are provided following the xyz numbering.
-`conjatoms`: for calculation with pipop keyword in mndo template, specify the atoms in the conjugate system. Indexes are provided following xyz numbering.
+This is a listo of the keywords added or modified in the MNDO-Tinker interface.
+
+<B>mndomm</B>: enable QM(MNDO)/MM calculation
+
+<B>mndoexe</B>: specify the MNDO2020 command in the shell environment (default mndo2020)
+
+<B>mndonoiterguess</B>: disable MNDO guess based on previous calculation (default is to do it). This option disable automatic keyword ipubo=1,ktrial=11,imomap=3.
+
+<B>mndotemplate</B>: specify the MNDO template to create the MNDO input during a QM/MM calculation (default is template.inp). Note that according to the option provided, Tinker read the option of template file, modify them where needed and than reassemble the output from scratch.
+
+<B>mndopostexe</B>: if specified, the script/excutable is run after the excution of MNDO. It can be used to archive files, extract information from MNDO logs etc.
+
+<B>mndoallgrd</B>: ask mndo to compute gradients for all the electronic states included in the calculation (default is to only compute gradients on current state). This is only allowed with kci=5.
+
+<B>mndostates</B>: number of electronic states to be computed in MNDO calculation (default is to only compute ground state).
+
+<B>mndocurrentstate</B>: state to be used for the dynamic propagation (default is ground state).
+
+<B>inactive</B>: same behavior of standard Tinker but if an MM atom is set inactive, its gradients are not computed in QM/MM calculation, actually reducing the overall cost.
+
+<B>qmatoms</B>: specify which are the atoms in the QM part of the system. LA are automatically generated where needed. Indexes are provided following the xyz numbering.
+
+<B>conjatoms</B>: for calculation with pipop keyword in mndo template, specify the atoms in the conjugate system. Indexes are provided following xyz numbering.
