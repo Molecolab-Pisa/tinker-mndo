@@ -212,7 +212,7 @@ c           write header
         close(unit=iintf)
         
         deallocate(nac)
-        deallocate(nac_la)
+        if(mndo_usela) deallocate(nac_la)
 
         if(mndo_debug) write(6, *) "Exiting subroutine mndordnac"
 
