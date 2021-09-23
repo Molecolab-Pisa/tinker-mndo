@@ -27,8 +27,8 @@ c       Create new input file with jop=-2 for gradients calculation
 
 c       Run MNDO
         write(command, *) mndo_exe(:trimtext(mndo_exe)), 
-     &  " < ", mndo_in(:trimtext(mndo_in)), " >& ",
-     &  mndo_out(:trimtext(mndo_out))
+     &  " < ", mndo_in(:trimtext(mndo_in)), " > ",
+     &  mndo_out(:trimtext(mndo_out)), " 2>&1 "
         if(mndo_debug) write(6, *) command(:trimtext(command))
         status = system(command)
 
